@@ -1,0 +1,29 @@
+{
+  "name": "hybrid-mount-miuix",
+  "author": {"name": "luyanci"},
+  "description": "hybrid mount metamodule's webui,based on miuix-vue.(WIP)",
+  "private": true,
+  "version": "0.1.0-alpha",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "check": "vue-tsc -b",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.5.34"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.3",
+    "@vitejs/plugin-vue": "^6.0.6",
+    "@vue/tsconfig": "^0.9.1",
+    "@vueuse/core": "^14.3.0",
+    "kernelsu": "^3.0.2",
+    "miuix-vue": "^0.1.1",
+    "motion-v": "^2.3.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.12",
+    "vue-tsc": "^3.2.8"
+  }
+}
