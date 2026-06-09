@@ -1,22 +1,23 @@
 <script setup lang="ts">
 import { ref,computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { MiuixSnackbarHost,MiuixScrollArea } from 'miuix-vue'
 import { MiuixIcon,MiuixNavigationBar,type MiuixNavigationItem } from 'miuix-vue'
-import { ScreenMirroring,Settings,Info,Folder } from 'miuix-vue/icons/extended'
+import { ScreenMirroring,Settings,Tune,Info,Folder } from 'miuix-vue/icons'
 
 import miuixhello from './page/miuixhello.vue'
 import HelloWorld from './page/HelloWorld.vue'
 import Topbar from './components/Topbar.vue'
 
-const pages = [HelloWorld,miuixhello,HelloWorld,miuixhello]
-const titles = ['Home','Configure','Modules', 'About']
+const { t } = useI18n()
+
+const pages = [HelloWorld,miuixhello,HelloWorld,HelloWorld,miuixhello]
+const titles = [t('tabs.status'),t('tabs.config'),t('tabs.kasumi'),t('tabs.modules'), t('tabs.info')]
 const navItems: MiuixNavigationItem[] = titles.map((label) => ({ label }))
-const navicoms = [ScreenMirroring,Settings,Folder,Info]
+const navicoms = [ScreenMirroring,Settings,Tune,Folder,Info]
 
 const navindex = ref(0)
 const activepage = computed(() => pages[navindex.value])
-const activetitle = computed(() => titles[navindex.value])
-
 </script>
 
 <template>

@@ -1,10 +1,10 @@
 <script setup lang="ts"> 
 import { MiuixIcon,MiuixNavigationBar,type MiuixNavigationItem } from 'miuix-vue'
-import { ScreenMirroring,Settings,Info,Folder } from 'miuix-vue/icons/extended'
+import { ScreenMirroring,Settings,Tune,Info,Folder } from 'miuix-vue/icons'
 
-const title = ['Home','Configure','Modules', 'About']
+const title = ['Home','Configure','kasumi','Modules', 'About']
 const navItems: MiuixNavigationItem[] = title.map((label) => ({ label }))
-const navicoms = [ScreenMirroring,Settings,Folder,Info]
+const navicoms = [ScreenMirroring,Settings,Tune,Folder,Info]
 </script>
 
 <template>
