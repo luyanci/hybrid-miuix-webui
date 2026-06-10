@@ -35,7 +35,7 @@ function handleChange(value: number) {
   <MiuixSmallTitle>lang</MiuixSmallTitle>
 
   <MiuixCard> 
-    <MiuixDropdownPreference title="Language" :summary="lang_code[lang_dropdown_index]" v-model="lang_dropdown_index" :items="display_list" />
+    <MiuixDropdownPreference :title="t('common.language')" :summary="lang_code[lang_dropdown_index]" v-model="lang_dropdown_index" :items="display_list" />
     <MiuixButton @click="handleChange(lang_dropdown_index)">{{t('config.save')}}</MiuixButton>
   </MiuixCard></div>
   <MiuixSmallTitle>Config</MiuixSmallTitle>
