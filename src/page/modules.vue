@@ -2,13 +2,28 @@
 import { ref } from 'vue'
 import { MiuixSearchBar } from 'miuix-vue'
 
-const search = ref('')
+const searchQuery = ref('')
+const searchexpanded = ref(false)
+const searchSuggestions = []
 </script>
 
 <template>
-  <MiuixSearchBar v-model="search">
-    <template #icon>
-      <miuix-icon name="search" />
-    </template>
-  </MiuixSearchBar>
+  <div class="page">
+    <MiuixSearchBar v-model="searchQuery"
+    v-model:expanded="searchexpanded"
+    label="Search"
+    class="searchbar">
+    </MiuixSearchBar>
+</div>
 </template>
+
+<style scoped>
+.page {
+  padding: 12px;
+  margin-bottom: 12px;
+
+}
+.searchbar {
+  margin-bottom: 12px;
+}
+</style>

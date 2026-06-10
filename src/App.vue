@@ -50,17 +50,15 @@ loadLocale('en-US')
 </script>
 
 <template>
-  <MiuixScrollArea>
-    <div class="topbar">
+  <div class="app">
+  <MiuixScrollArea class="app__body">
         <MiuixTopAppBar :large="false" :title="Apptitle">
         <template #actions>
             <MiuixIconButton aria-label="Toggle" @click="rebootreq_click = true">
                 <MiuixIcon :icon="Close2" :size="24" />
             </MiuixIconButton>
         </template>
-
         </MiuixTopAppBar>
-    </div>
 
   <Transition name="fade">
     <component :is="activepage" v-if="activepage" />
@@ -75,7 +73,7 @@ loadLocale('en-US')
     </MiuixNavigationBar>
   </div>
   <MiuixSnackbarHost />
-
+  </div>
   <MiuixDialog 
     v-model="rebootreq_click"
     :title="Reboottitle"
@@ -83,7 +81,7 @@ loadLocale('en-US')
     @close="rebootreq_click = false"> 
         <template #default="{close}">
             <div class="miuix-dialog-actions"> 
-                <MiuixButton class="ex-glow" type="Secondary" @click="rebootreq_click = false">{{t('common.cancel')}}</MiuixButton>
+                <MiuixButton class="ex-glow" type="Secondary" @click="close">{{t('common.cancel')}}</MiuixButton>
                 <MiuixButton class="ex-glow" type="primary" @click="reboot_system">{{t('common.reboot')}}</MiuixButton>
             </div>
         </template>
@@ -101,6 +99,14 @@ body {
   font-family: 'Misans VF', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   background: var(--m-color-background);
   color: var(--m-color-on-background)
+}
+.app { 
+  &__body {
+    flex: 1;
+    min-height: 0;
+    --m-scroll-area-inset-top: 52px;
+  }
+  
 }
 .app__bottom {
   position: fixed;
@@ -123,4 +129,5 @@ body {
 .ex-glow {
     flex: 1;
 }
+
 </style>
