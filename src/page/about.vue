@@ -8,7 +8,6 @@ import hybrid from '../assets/icon.svg'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
-const count = ref(0)
 
 function open_github_repo() {
   window.open('https://github.com/hybrid-mount/meta-hybrid_mount')
