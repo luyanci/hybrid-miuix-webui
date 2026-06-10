@@ -1,22 +1,26 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import hybrid from '../assets/icon.svg'
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+import {MiuixCard,MiuixSmallTitle,MiuixSwitch,MiuixText,MiuixButton,MiuixRadioButtonPreference,MiuixDropdownPreference,MiuixInput,MiuixBasicComponent,MiuixIcon} from 'miuix-vue'
 
-const count = ref(0)
+const kasumi = ref({
+  enabled: false
+})
+
 </script>
 
 <template>
-  <section id="center">
-    <div class="hero">
-      <img :src="hybrid" class="base" width="170" height="179" alt="" />
-    </div>
-    <div>
-      <h1>Yet another Get started 3</h1>
-      <p>Edit <code>src/App.vue</code> and save to test <code>HMR</code></p>
-    </div>
-    <button type="button" class="counter" @click="count++">
-      Count is {{ count }}
-    </button>
-  </section>
+  <MiuixSmallTitle>Kasumi</MiuixSmallTitle>
+  <MiuixCard>
+    <MiuixBasicComponent> 
+      <template #start>
+        <MiuixText>{{t('config.kasumiMasterSwitch')}}</MiuixText>
+      </template>
+      <template #end>
+        <MiuixSwitch v-model="kasumi.enabled" label="Enabled" />
+      </template>
+    </MiuixBasicComponent>
+  </MiuixCard>
 
 </template>

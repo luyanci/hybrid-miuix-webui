@@ -30,8 +30,8 @@ function open_koukuban_paypal() {
     <h1>{{t('common.appName')}}</h1>
   </div>
   <MiuixCard>
-      <MiuixArrowPreference :title="t('info.projectLink')" @click="open_github_repo" />
-      <MiuixArrowPreference :title="t('info.telegram')" @click="open_telegram" />
+      <MiuixArrowPreference :title="t('info.projectLink')" summary="github.com/hybrid-mount/meta-hybrid_mount" @click="open_github_repo" />
+      <MiuixArrowPreference :title="t('info.telegram')" summary="@hybridmountchat" @click="open_telegram" />
       <MiuixArrowPreference :title="t('info.donate')" @click="open_donate = true" />
   </MiuixCard>
 

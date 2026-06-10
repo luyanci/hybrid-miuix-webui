@@ -46,7 +46,6 @@ const activepage = computed(() => pages[navindex.value])
 function reboot_system(): void {
     exec('reboot')
 }
-loadLocale('en-US')
 </script>
 
 <template>
@@ -60,8 +59,10 @@ loadLocale('en-US')
         </template>
         </MiuixTopAppBar>
 
-  <Transition name="fade">
-    <component :is="activepage" v-if="activepage" />
+  <Transition name="fade" mode="out-in">
+    <div>
+      <component :is="activepage" v-if="activepage" />
+    </div>
   </Transition>
   </MiuixScrollArea>
   
@@ -72,8 +73,10 @@ loadLocale('en-US')
         </template>
     </MiuixNavigationBar>
   </div>
-  <MiuixSnackbarHost />
   </div>
+  <MiuixSnackbarHost />
+
+  
   <MiuixDialog 
     v-model="rebootreq_click"
     :title="Reboottitle"
@@ -104,16 +107,18 @@ body {
   &__body {
     flex: 1;
     min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
     --m-scroll-area-inset-top: 52px;
   }
   
 }
 .app__bottom {
+  flex: none;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 999;
 }
 .topbar {
     position: fixed;

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { MiuixSearchBar } from 'miuix-vue'
+import { useI18n } from 'vue-i18n'
+import { MiuixSearchBar,MiuixCard } from 'miuix-vue'
+const { t } = useI18n()
 
 const searchQuery = ref('')
 const searchexpanded = ref(false)
@@ -11,7 +13,7 @@ const searchSuggestions = []
   <div class="page">
     <MiuixSearchBar v-model="searchQuery"
     v-model:expanded="searchexpanded"
-    label="Search"
+    :label="t('modules.searchPlaceholder')"
     class="searchbar">
     </MiuixSearchBar>
 </div>
