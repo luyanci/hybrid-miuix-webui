@@ -117,18 +117,16 @@ function reboot_system(): void {
 .app {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
-  min-height: 0;
+  height: 100vh;
   background: var(--m-color-surface);
-
-  &__body {
+}
+.app__body {
     flex: 1;
     min-height: 0;
+    overflow: hidden;
     --m-scroll-area-inset-top: 52px;
-  }
-
-
 }
+
 .app__bottom {
   flex:none;
   z-index: 10;
