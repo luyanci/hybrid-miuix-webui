@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref,onMounted } from 'vue'
 import { 
   MiuixCard,
   MiuixArrowPreference,
   MiuixBottomSheet,
   MiuixSmallTitle,
+  MiuixBasicComponent,
+  MiuixText
  } from 'miuix-vue'
 import hybrid from '../assets/icon.svg'
 import { useI18n } from 'vue-i18n'
+import axios from 'axios'
 
 const version = __APP_VERSION__
-console.log(version)
 
 const { t } = useI18n()
 const open_donate = ref(false)
@@ -18,6 +20,18 @@ const open_koukuban_wechat = ref(false)
 const open_koukuban_alipay = ref(false)
 const open_koukuban_binance = ref(false)
 const open_tools_cx_app_wechat = ref(false)
+const contributors = ref([])
+
+axios.get('https://api.github.com/repos/hybrid-mount/meta-hybrid_mount/contributors')
+.then(function (response) {
+  contributors.value = response.data.filter(function (contributor) {
+    return contributor.type === 'User'
+  })
+})
+.catch(function (error) {
+  console.log(error)
+  contributors.value = []
+})
 
 function open_github_repo() {
   window.open('https://github.com/hybrid-mount/meta-hybrid_mount')
@@ -30,6 +44,8 @@ function open_telegram() {
 function open_koukuban_paypal() {
   window.open('https://www.paypal.com/paypalme/LangQin280')
 }
+
+
 </script>
 
 <template>
@@ -37,7 +53,7 @@ function open_koukuban_paypal() {
     <div class="hero">
       <img :src="hybrid" class="base" alt="" />
       <h1>{{t('common.appName')}}</h1>
-      <p class="subtitle">{{version}}</p>
+      <MiuiText class="subtitle">{{version}}</MiuiText>
     </div>
     
     <MiuixCard class="ex-card">
@@ -57,6 +73,16 @@ function open_koukuban_paypal() {
       <MiuixSmallTitle :text="'Tool-cx-app'" />
       <MiuixArrowPreference title="Wechat" @click="open_tools_cx_app_wechat = true" />
     </MiuixBottomSheet>
+
+    <MiuixSmallTitle :text="t('info.contributors')" />
+    <MiuixCard class="ex-card" :title="contributors.length"> 
+      <div v-if="contributors.length > 0" v-for="contributor in contributors" :key="contributor.id">
+        <MiuixBasicComponent :title="contributor.login" :summary="t('info.noBio')" />
+      </div>
+      <div v-else>
+        <MiuixBasicComponent :title="t('info.loadFail')" />
+      </div>
+    </MiuixCard>
 
     <div v-if="open_koukuban_alipay"
     style="
