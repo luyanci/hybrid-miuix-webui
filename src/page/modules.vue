@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { MiuixSearchBar,MiuixCard } from 'miuix-vue'
+import { MiuixSearchBar,MiuixCard,MiuixSmallTitle } from 'miuix-vue'
 const { t } = useI18n()
 
 const searchQuery = ref('')
@@ -11,21 +11,18 @@ const searchSuggestions = []
 
 <template>
   <div class="page">
-    <MiuixSearchBar v-model="searchQuery"
-    v-model:expanded="searchexpanded"
-    :label="t('modules.searchPlaceholder')"
-    class="searchbar">
-    </MiuixSearchBar>
-</div>
+    <MiuixSmallTitle :text="t('modules.searchPlaceholder')" />
+    <div class="icon-search">
+      <MiuixSearchBar v-model="searchQuery"
+      v-model:expanded="searchexpanded"
+      :label="t('modules.searchPlaceholder')">
+      </MiuixSearchBar>
+    </div>
+  </div>
 </template>
 
 <style scoped>
-.page {
-  padding: 12px;
-  margin-bottom: 12px;
-
-}
-.searchbar {
-  margin-bottom: 12px;
+.icon-search {
+  padding: 0 0 6px;
 }
 </style>

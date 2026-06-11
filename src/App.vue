@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref,computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { 
   MiuixSnackbarHost,
@@ -38,11 +38,32 @@ const rebootreq_click = ref(false)
 
 const pages = [status,config,kasumi,modules,about]
 const titles = [t('tabs.status'),t('tabs.config'),t('tabs.kasumi'),t('tabs.modules'), t('tabs.info')]
-const navItems: MiuixNavigationItem[] = titles.map((label) => ({ label }))
+const navItems = titles.map((label) => ({ label }))
 const navicoms = [ScreenMirroring,Settings,Tune,Folder,Info]
 
 const navindex = ref(0)
 const activepage = computed(() => pages[navindex.value])
+
+// Each tab keeps its own scroll position
+interface Scroller {
+  getScrollTop: () => number
+  setScrollTop: (top: number) => void
+}
+const scrollerRef = ref<Scroller | null>(null)
+const scrollPositions = new Map<number, number>()
+
+watch(
+  navindex,
+  (_next, prev) => {
+    scrollPositions.set(prev, scrollerRef.value?.getScrollTop() ?? 0)
+  },
+  { flush: 'pre' },
+)
+
+function onPageEnter(): void {
+  scrollerRef.value?.setScrollTop(scrollPositions.get(navindex.value) ?? 0)
+}
+
 function reboot_system(): void {
     exec('reboot')
 }
@@ -50,89 +71,84 @@ function reboot_system(): void {
 
 <template>
   <div class="app">
-  <MiuixScrollArea class="app__body">
-        <MiuixTopAppBar :large="false" :title="Apptitle">
+    <!-- The TopAppBar is the screen's top bar -->
+    <MiuixScrollArea ref="scrollerRef" class="app__body">
+      <MiuixTopAppBar :large="false" :title="Apptitle">
         <template #actions>
-            <MiuixIconButton aria-label="Toggle" @click="rebootreq_click = true">
-                <MiuixIcon :icon="Close2" :size="24" />
-            </MiuixIconButton>
+          <MiuixIconButton aria-label="Toggle" @click="rebootreq_click = true">
+            <MiuixIcon :icon="Close2" :size="24" />
+          </MiuixIconButton>
         </template>
-        </MiuixTopAppBar>
+      </MiuixTopAppBar>
 
-  <Transition name="fade" mode="out-in">
-    <div>
-      <component :is="activepage" v-if="activepage" />
-    </div>
-  </Transition>
-  </MiuixScrollArea>
+      <Transition name="page" mode="out-in" @enter="onPageEnter">
+        <KeepAlive>
+          <component :is="activepage" :key="navindex" v-if="activepage" />
+        </KeepAlive>
+      </Transition>
+    </MiuixScrollArea>
   
-  <div ref="buttomBarRef" class="app__bottom">
-    <MiuixNavigationBar v-model="navindex" :items="navItems">
+    <div class="app__bottom">
+      <MiuixNavigationBar v-model="navindex" :items="navItems">
         <template #icon="{ index }">
-            <MiuixIcon :icon="navicoms[index]" :size="20" />
+          <MiuixIcon :icon="navicoms[index]" :size="26" />
         </template>
-    </MiuixNavigationBar>
+      </MiuixNavigationBar>
+    </div>
   </div>
-  </div>
+
   <MiuixSnackbarHost />
 
-  
   <MiuixDialog 
     v-model="rebootreq_click"
     :title="Reboottitle"
     :summary="RebootSummary"
     @close="rebootreq_click = false"> 
-        <template #default="{close}">
-            <div class="miuix-dialog-actions"> 
-                <MiuixButton class="ex-glow" type="Secondary" @click="close">{{t('common.cancel')}}</MiuixButton>
-                <MiuixButton class="ex-glow" type="primary" @click="reboot_system">{{t('common.reboot')}}</MiuixButton>
-            </div>
-        </template>
+    <template #default="{close}">
+      <div class="ex-dialog-actions"> 
+        <MiuixButton class="ex-grow" @click="close">{{t('common.cancel')}}</MiuixButton>
+        <MiuixButton class="ex-grow" type="primary" @click="reboot_system">{{t('common.reboot')}}</MiuixButton>
+      </div>
+    </template>
   </MiuixDialog>
 </template>
 
 <style scoped>
-html,
-body {
-  margin: 0;
-  height: 100%;
-}
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+  background: var(--m-color-surface);
 
-body {
-  font-family: 'Misans VF', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background: var(--m-color-background);
-  color: var(--m-color-on-background)
-}
-.app { 
   &__body {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
     --m-scroll-area-inset-top: 52px;
   }
-  
+
+
 }
 .app__bottom {
-  flex: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-.topbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1;
-}
-.miuix-dialog-actions {
-    display: flex;
-    gap: 12px;
-}
-.ex-glow {
-    flex: 1;
+  flex:none;
+  z-index: 10;
 }
 
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.18s ease;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+
+.ex-dialog-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.ex-grow {
+  flex: 1;
+}
 </style>

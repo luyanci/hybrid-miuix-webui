@@ -11,16 +11,23 @@ const kasumi = ref({
 </script>
 
 <template>
-  <MiuixSmallTitle>Kasumi</MiuixSmallTitle>
-  <MiuixCard>
-    <MiuixBasicComponent> 
-      <template #start>
-        <MiuixText>{{t('config.kasumiMasterSwitch')}}</MiuixText>
-      </template>
-      <template #end>
-        <MiuixSwitch v-model="kasumi.enabled" label="Enabled" />
-      </template>
-    </MiuixBasicComponent>
-  </MiuixCard>
-
+  <div class="page">
+    <MiuixSmallTitle :text="'Kasumi'" />
+    <MiuixCard class="ex-card">
+      <MiuixBasicComponent> 
+        <template #start>
+          <MiuixText>{{t('config.kasumiMasterSwitch')}}</MiuixText>
+        </template>
+        <template #end>
+          <MiuixSwitch v-model="kasumi.enabled" label="Enabled" />
+        </template>
+      </MiuixBasicComponent>
+    </MiuixCard>
+  </div>
 </template>
+
+<style scoped>
+.ex-card {
+  margin: 0 12px 12px;
+}
+</style>
