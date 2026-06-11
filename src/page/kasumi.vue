@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 import {MiuixCard,MiuixSmallTitle,MiuixSwitch,MiuixText,MiuixButton,MiuixRadioButtonPreference,MiuixDropdownPreference,MiuixInput,MiuixBasicComponent,MiuixIcon} from 'miuix-vue'
-
+import { Info } from 'miuix-vue/icons'
 const kasumi = ref({
   enabled: false
 })
@@ -12,7 +12,14 @@ const kasumi = ref({
 
 <template>
   <div class="page">
-    <MiuixSmallTitle :text="'Kasumi'" />
+    <MiuixCard class="ex-card ex-card--pad"> 
+      <MiuixBasicComponent :title="t('kasumi.title')" :summary="t('kasumi.statusDisabled')">
+        <template #start>
+          <MiuixIcon :icon="Info" />
+        </template>
+      </MiuixBasicComponent>
+    </MiuixCard>
+
     <MiuixCard class="ex-card">
       <MiuixBasicComponent> 
         <template #start>
