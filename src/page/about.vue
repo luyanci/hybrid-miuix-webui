@@ -8,7 +8,6 @@ import {
  } from 'miuix-vue'
 import hybrid from '../assets/icon.svg'
 import { useI18n } from 'vue-i18n'
-import Viewer from 'viewerjs'
 
 const version = __APP_VERSION__
 console.log(version)
