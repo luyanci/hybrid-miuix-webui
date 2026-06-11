@@ -8,9 +8,18 @@ import {
  } from 'miuix-vue'
 import hybrid from '../assets/icon.svg'
 import { useI18n } from 'vue-i18n'
+import Viewer from 'viewerjs'
+
+const version = __APP_VERSION__
+console.log(version)
 
 const { t } = useI18n()
 const open_donate = ref(false)
+const open_koukuban_wechat = ref(false)
+const open_koukuban_alipay = ref(false)
+const open_koukuban_binance = ref(false)
+const open_tools_cx_app_wechat = ref(false)
+
 function open_github_repo() {
   window.open('https://github.com/hybrid-mount/meta-hybrid_mount')
 }
@@ -29,6 +38,7 @@ function open_koukuban_paypal() {
     <div class="hero">
       <img :src="hybrid" class="base" alt="" />
       <h1>{{t('common.appName')}}</h1>
+      <p class="subtitle">{{version}}</p>
     </div>
     
     <MiuixCard class="ex-card">
@@ -40,14 +50,59 @@ function open_koukuban_paypal() {
     <MiuixBottomSheet v-model="open_donate" :title="t('info.supportUs')">
       <MiuixSmallTitle :text="'YuzakiKokuban'" />
       <MiuixCard class="ex-mb12">
-        <MiuixArrowPreference title="Alipay" />
-        <MiuixArrowPreference title="Wechat" />
-        <MiuixArrowPreference title="Binance" />
+        <MiuixArrowPreference title="Alipay" @click="open_koukuban_alipay = true" />
+        <MiuixArrowPreference title="Wechat" @click="open_koukuban_wechat = true" />
+        <MiuixArrowPreference title="Binance" @click="open_koukuban_binance = true" />
         <MiuixArrowPreference title="PayPal" @click="open_koukuban_paypal" />
       </MiuixCard>
       <MiuixSmallTitle :text="'Tool-cx-app'" />
-      <MiuixArrowPreference title="Wechat" />
+      <MiuixArrowPreference title="Wechat" @click="open_tools_cx_app_wechat = true" />
     </MiuixBottomSheet>
+
+    <div v-if="open_koukuban_alipay"
+    style="
+    position: fixed;top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.7);
+    display: flex;align-items:center;justify-content:center;
+    z-index:9999;"
+    @click="open_koukuban_alipay = false">
+      <img src="/assets/donate/yuzaki_alipay.jpg"
+      alt=""
+      style="width: 400px;max-width: 80%;height:auto;" />
+    </div>
+    <div v-if="open_koukuban_wechat"
+    style="
+    position: fixed;top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.7);
+    display: flex;align-items:center;justify-content:center;
+    z-index:9999;"
+    @click="open_koukuban_wechat = false">
+      <img src="/assets/donate/yuzaki_wechat.jpg"
+      alt=""
+      style="width: 400px;max-width: 80%;height:auto;" />
+    </div>
+    <div v-if="open_koukuban_binance"
+    style="
+    position: fixed;top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.7);
+    display: flex;align-items:center;justify-content:center;
+    z-index:9999;"
+    @click="open_koukuban_binance = false">
+      <img src="/assets/donate/yuzaki_binance.jpg"
+      alt=""
+      style="width: 400px;max-width: 80%;height:auto;" />
+    </div>
+    <div v-if="open_tools_cx_app_wechat"
+    style="
+    position: fixed;top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.7);
+    display: flex;align-items:center;justify-content:center;
+    z-index:9999;"
+    @click="open_tools_cx_app_wechat = false">
+      <img src="/assets/donate/tools_wechat.jpg"
+      alt=""
+      style="width: 400px;max-width: 80%;height:auto;" />
+    </div>
   </div>
 </template>
 
@@ -84,4 +139,20 @@ function open_koukuban_paypal() {
 .ex-mb12 {
   margin-bottom: 12px;
 }
+
+.fade-scale-enter-active,
+.fade-scale-leave-active {
+  transition: all 0.3s ease;
+}
+.fade-scale-enter,
+.fade-scale-leave-to {
+  opacity: 0;
+  transform: scale(0.8);
+}
+.fade-scale-enter-from,
+.fade-scale-leave {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
 </style>
