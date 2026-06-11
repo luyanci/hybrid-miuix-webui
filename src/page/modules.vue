@@ -11,7 +11,6 @@ const searchSuggestions = []
 
 <template>
   <div class="page">
-    <MiuixSmallTitle :text="t('modules.searchPlaceholder')" />
     <div class="icon-search">
       <MiuixSearchBar v-model="searchQuery"
       v-model:expanded="searchexpanded"
