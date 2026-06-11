@@ -69,8 +69,8 @@ function handleChange(value: number) {
           <MiuixIcon :icon="Settings" />
         </template>
       </MiuixBasicComponent>
-      <MiuixRadioButtonPreference :model-value="overlay_workmode === 0" :title="t('config.mode_ext4')" :summary="t('config.mode_ext4Desc')" @select="overlay_workmode = 0"/>
-      <MiuixRadioButtonPreference :model-value="overlay_workmode === 1" :title="t('config.mode_tmpfs')" :summary="t('config.mode_tmpfsDesc')" @select="overlay_workmode = 1"/>
+      <MiuixRadioButtonPreference :model-value="overlay_workmode === 0" :title="t('config.mode_tmpfs')" :summary="t('config.mode_tmpfsDesc')" @select="overlay_workmode = 0"/>
+      <MiuixRadioButtonPreference :model-value="overlay_workmode === 1" :title="t('config.mode_ext4')" :summary="t('config.mode_ext4Desc')" @select="overlay_workmode = 1"/>
     </MiuixCard>
 
     <MiuixCard class="ex-card">
