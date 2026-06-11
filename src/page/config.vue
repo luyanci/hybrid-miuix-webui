@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { getCurrentLangIndex, switchLocale, getSupportedLocales } from '../locales'
 import {MiuixCard,MiuixSmallTitle,MiuixText,MiuixSwitch,MiuixButton,MiuixRadioButtonPreference,MiuixDropdownPreference,MiuixInput,MiuixBasicComponent,MiuixIcon} from 'miuix-vue'
 import {FolderFill,MoveFile,Settings} from 'miuix-vue/icons'
+import { run_hybird_api_command } from '../lib/hybrid';
 const { t } = useI18n()
 
 const text1 = ref('')
@@ -14,13 +15,20 @@ const lang_dropdown_index = ref(0)
 
 const overlay_workmode = ref(0)
 const daemon = ref(false)
-const umount_enabled = ref(false)
+const umount_disabled = ref(false)
 onMounted(async () => {
   const supported_locales = await getSupportedLocales()
   const lang_index= await getCurrentLangIndex()
   lang_dropdown_index.value = lang_index
   display_list.value = supported_locales.map(supported_locales => supported_locales.display)
   lang_code.value = supported_locales.map(supported_locales => supported_locales.code)
+
+  const configs = await run_hybird_api_command('config-get')
+  text1.value = configs.moduledir
+  text2.value = configs.mountsource
+  overlay_workmode.value = configs.overlay_mode === 'ext4' ? 1 : 0
+  umount_disabled.value = configs.disable_umount
+  daemon.value = configs.daemon_startup_mode == 'persistent' ? true : false
 })
 
 function handleChange(value: number) {
@@ -32,7 +40,7 @@ function handleChange(value: number) {
 
 <template>
   <div class="page">
-    <MiuixSmallTitle :text="'Language'" />
+    <MiuixSmallTitle :text="t('config.webui')" />
     <MiuixCard class="ex-card"> 
       <MiuixDropdownPreference :title="t('common.language')" :summary="lang_code[lang_dropdown_index]" v-model="lang_dropdown_index" :items="display_list" />
       <div style="padding: 12px;">
@@ -40,7 +48,7 @@ function handleChange(value: number) {
       </div>
     </MiuixCard>
 
-    <MiuixSmallTitle :text="'Config'" />
+    <MiuixSmallTitle :text="t('tabs.config')" />
     <MiuixCard class="ex-card"> 
       <MiuixBasicComponent :title="t('config.moduleDir')" :summary="t('config.moduleDirDesc')">
         <template #start>
@@ -79,7 +87,7 @@ function handleChange(value: number) {
           <MiuixText>{{t('config.disableUmount')}}</MiuixText>
         </template>
         <template #end>
-          <MiuixSwitch v-model="umount_enabled" label="Enabled" />
+          <MiuixSwitch v-model="umount_disabled" label="Enabled" />
         </template>
       </MiuixBasicComponent>
     </MiuixCard>

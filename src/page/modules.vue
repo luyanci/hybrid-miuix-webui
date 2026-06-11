@@ -1,12 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref,onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { MiuixSearchBar,MiuixCard,MiuixSmallTitle } from 'miuix-vue'
 const { t } = useI18n()
+import { run_hybird_api_command } from '../lib/hybrid'
 
 const searchQuery = ref('')
 const searchexpanded = ref(false)
 const searchSuggestions = []
+const modules_list = ref([])
+
+onMounted(async() => {
+  await run_hybird_api_command('modules-list')
+  modules_list.value = await run_hybird_api_command('modules-list')
+})
 </script>
 
 <template>

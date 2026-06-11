@@ -18,8 +18,7 @@ import {
   Info,
   Folder,
   Close2  } from 'miuix-vue/icons'
-import { exec } from 'kernelsu'
-import { loadLocale } from './locales'
+import { run_hybird_api_command } from './lib/hybrid.ts'
 
 import status from './page/status.vue'
 import config from './page/config.vue'
@@ -65,7 +64,7 @@ function onPageEnter(): void {
 }
 
 function reboot_system(): void {
-    exec('reboot')
+    run_hybird_api_command('reboot')
 }
 </script>
 

@@ -17,6 +17,9 @@ const kasumi = ref({
         <template #start>
           <MiuixIcon :icon="Info" />
         </template>
+        <template #end>
+          <MiuixSwitch v-model="kasumi.enabled" label="Enabled" />
+        </template>
       </MiuixBasicComponent>
     </MiuixCard>
 

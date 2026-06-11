@@ -2,20 +2,37 @@
 import { ref,onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
-import { exec } from 'kernelsu'
-import {MiuixCard,MiuixSmallTitle,MiuixText,MiuixSwitch,MiuixButton,MiuixRadioButtonPreference,MiuixDropdownPreference,MiuixInput,MiuixBasicComponent,MiuixIcon} from 'miuix-vue'
+import {MiuixCard,MiuixSmallTitle,MiuixBasicComponent,MiuixIcon} from 'miuix-vue'
 import { Info } from 'miuix-vue/icons'
+import { run_hybird_api_command,run_hybird_daemon_status_command } from '../lib/hybrid'
 
-const storage = ref('Ext4');
+const storage_path = ref('/dev/homo/114514');
+const storage_mode = ref('HomoFS');
+const actived_count = ref(0);
 const kernel_version = ref('5.14.114-homo');
 const selinux = ref('Enforcing');
+const mount_source = ref('HOMO');
+const overlay_count = ref(1);
+const magic_count = ref(1);
+const kasumi_count = ref(4);
 
 
 onMounted(async () => {
-  const kversion = await exec('uname -r')
-  kernel_version.value = kversion.stdout
-  const selinux_status = await exec('getenforce')
-  selinux.value = selinux_status.stdout
+  const info = await run_hybird_api_command('system-info');
+  kernel_version.value = info.kernel;
+  selinux.value = info.selinux;
+  const storage_info = await run_hybird_api_command('storage');
+  storage_mode.value = storage_info.mode;
+  storage_path.value = storage_info.path;
+  const mounts = await run_hybird_api_command('modules-list');
+  actived_count.value = mounts.length;
+  const configs = await run_hybird_api_command('config-get');
+  mount_source.value = configs.mountsource;
+  const daemon_status = await run_hybird_daemon_status_command();
+  const mode_stats = daemon_status.mode_stats
+  overlay_count.value = mode_stats.overlayfs;
+  magic_count.value = mode_stats.magicmount;
+  kasumi_count.value = mode_stats.kasumi;
 });
 
 </script>
@@ -23,9 +40,40 @@ onMounted(async () => {
 <template>
   <div class="page">
     <MiuixCard class="ex-card ex-card--pad"> 
-      <MiuixBasicComponent :title="t('status.storageTitle')" :summary="storage">
+      <MiuixBasicComponent :title="t('status.storageTitle')" :summary="storage_mode">
         <template #start>
           <MiuixIcon :icon="Info" />
+        </template>
+        <template #end>
+          <MiuixText>{{storage_path}}</MiuixText>
+        </template>
+      </MiuixBasicComponent>
+      <MiuixBasicComponent :title="t('status.moduleActive')">
+        <template #end>
+          <MiuixText>{{actived_count}}</MiuixText>
+        </template>
+      </MiuixBasicComponent>
+            <MiuixBasicComponent :title="t('status.mountBase')">
+        <template #end>
+          <MiuixText>{{mount_source}}</MiuixText>
+        </template>
+      </MiuixBasicComponent>
+    </MiuixCard>
+    <MiuixSmallTitle :text="t('status.modeStats')" />
+    <MiuixCard class="ex-card">
+      <MiuixBasicComponent title="Overlay">
+        <template #end>
+          <MiuixText>{{overlay_count}}</MiuixText>
+        </template>
+      </MiuixBasicComponent>
+      <MiuixBasicComponent title="Magic">
+        <template #end>
+          <MiuixText>{{magic_count}}</MiuixText>
+        </template>
+      </MiuixBasicComponent>
+      <MiuixBasicComponent title="Kasumi">
+        <template #end>
+          <MiuixText>{{kasumi_count}}</MiuixText>
         </template>
       </MiuixBasicComponent>
     </MiuixCard>

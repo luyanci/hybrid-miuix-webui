@@ -11,6 +11,7 @@ import {
 import hybrid from '../assets/icon.svg'
 import { useI18n } from 'vue-i18n'
 import axios from 'axios'
+import { run_hybird_api_command_open_url } from '../lib/hybrid'
 
 const version = __APP_VERSION__
 
@@ -24,25 +25,26 @@ const contributors = ref([])
 
 axios.get('https://api.github.com/repos/hybrid-mount/meta-hybrid_mount/contributors')
 .then(function (response) {
+  console.info(response.data)
   contributors.value = response.data.filter(function (contributor) {
     return contributor.type === 'User'
   })
 })
 .catch(function (error) {
-  console.log(error)
+  console.error(error)
   contributors.value = []
 })
 
 function open_github_repo() {
-  window.open('https://github.com/hybrid-mount/meta-hybrid_mount')
+  run_hybird_api_command_open_url('https://github.com/hybrid-mount/meta-hybrid_mount')
 }
 
 function open_telegram() {
-  window.open('https://t.me/hybridmountchat')
+  run_hybird_api_command_open_url('https://t.me/hybridmountchat')
 }
 
 function open_koukuban_paypal() {
-  window.open('https://www.paypal.com/paypalme/LangQin280')
+  run_hybird_api_command_open_url('https://www.paypal.com/paypalme/LangQin280')
 }
 
 
