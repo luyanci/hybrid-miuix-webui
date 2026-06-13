@@ -29,12 +29,21 @@ axios.get('https://api.github.com/repos/hybrid-mount/meta-hybrid_mount/contribut
   contributors.value = response.data.filter(function (contributor) {
     return contributor.type === 'User'
   })
+  for (let i = 0; i < contributors.value.length; i++) {
+  axios.get(contributors.value[i].url).then(function (response) {
+    if (response.data.bio === null) {
+      contributors.value[i].bio = t('info.noBio')
+    } else {
+    contributors.value[i].bio = response.data.bio
+    }
+  })}
 })
 .catch(function (error) {
   console.error(error)
   contributors.value = []
 })
 
+console.info(contributors.value);
 function open_github_repo() {
   run_hybird_api_command_open_url('https://github.com/hybrid-mount/meta-hybrid_mount')
 }
@@ -55,7 +64,7 @@ function open_koukuban_paypal() {
     <div class="hero">
       <img :src="hybrid" class="base" alt="" />
       <h1>{{t('common.appName')}}</h1>
-      <MiuiText class="subtitle">{{version}}</MiuiText>
+      <MiuixText>{{version}}</MiuixText>
     </div>
     
     <MiuixCard class="ex-card">
@@ -79,7 +88,7 @@ function open_koukuban_paypal() {
     <MiuixSmallTitle :text="t('info.contributors')" />
     <MiuixCard class="ex-card" :title="contributors.length"> 
       <div v-if="contributors.length > 0" v-for="contributor in contributors" :key="contributor.id">
-        <MiuixBasicComponent :title="contributor.login" :summary="t('info.noBio')" />
+        <MiuixBasicComponent :title="contributor.login" :summary="contributor.bio" />
       </div>
       <div v-else>
         <MiuixBasicComponent :title="t('info.loadFail')" />
