@@ -77,10 +77,10 @@ onMounted(async () => {
         <MiuixCard>
           <MiuixBasicComponent :summary="module.description" /> 
           <MiuixSmallTitle>{{t('modules.defaultMode')}}</MiuixSmallTitle>
-          <MiuixRadioButtonPreference :model-value='module.mode === "magic"' :title="t('modules.modes.short.magic')" :summary="t('modules.modes.magic')" @click='module.mode = "magic"'/>
-          <MiuixRadioButtonPreference :model-value='module.mode === "overlay"' :title="t('modules.modes.short.overlay')" :summary="t('modules.modes.overlay')" @click='module.mode = "overlay"'/>
-          <MiuixRadioButtonPreference :model-value='module.mode === "kasumi"' :title="t('modules.modes.kasumi')" :summary="t('modules.modes.kasumi')" @click='module.mode = "kasumi"'/>
-          <MiuixRadioButtonPreference :model-value='module.mode === "ignore"' :title="t('modules.modes.short.ignore')" :summary="t('modules.modes.unmounted')" @click='module.mode = "ignore"'/>
+          <MiuixRadioButtonPreference :model-value='module.mode === "overlay"' :title="t('modules.modes.short.overlay')" :summary="t('modules.defaultTag')" @click='module.mode = "overlay"'/>
+          <MiuixRadioButtonPreference :model-value='module.mode === "magic"' :title="t('modules.modes.short.magic')" :summary="t('modules.compatTag')" @click='module.mode = "magic"'/>
+          <MiuixRadioButtonPreference :model-value='module.mode === "kasumi"' :title="t('modules.modes.short.kasumi')" :summary="t('modules.nativeTag')" @click='module.mode = "kasumi"'/>
+          <MiuixRadioButtonPreference :model-value='module.mode === "ignore"' :title="t('modules.modes.short.ignore')" :summary="t('modules.disableTag')" @click='module.mode = "ignore"'/>
         </MiuixCard>
       </MiuixBottomSheet>
     </div>

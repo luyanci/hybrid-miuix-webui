@@ -36,6 +36,11 @@ axios.get('https://api.github.com/repos/hybrid-mount/meta-hybrid_mount/contribut
     } else {
     contributors.value[i].bio = response.data.bio
     }
+    if (response.data.name === null) {
+      contributors.value[i].name = contributors.value[i].login
+    } else {
+    contributors.value[i].name = response.data.name
+    }
   })}
 })
 .catch(function (error) {
@@ -55,7 +60,6 @@ function open_telegram() {
 function open_koukuban_paypal() {
   run_hybird_api_command_open_url('https://www.paypal.com/paypalme/LangQin280')
 }
-
 
 </script>
 
@@ -90,7 +94,7 @@ function open_koukuban_paypal() {
     <MiuixSmallTitle :text="t('info.contributors')" />
     <MiuixCard class="ex-card" :title="contributors.length"> 
       <div v-if="contributors.length > 0" v-for="contributor in contributors" :key="contributor.id">
-        <MiuixBasicComponent :title="contributor.login" :summary="contributor.bio" />
+        <MiuixArrowPreference :title="contributor.name" :summary="contributor.bio" @click="run_hybird_api_command_open_url(contributor.html_url)" />
       </div>
       <div v-else>
         <MiuixBasicComponent :title="t('info.loadFail')" />
