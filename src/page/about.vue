@@ -8,7 +8,7 @@ import {
   MiuixBasicComponent,
   MiuixText
  } from 'miuix-vue'
-import hybrid from '../assets/icon.svg'
+import hybrid from '../compoments/logo.vue'
 import { useI18n } from 'vue-i18n'
 import axios from 'axios'
 import { run_hybird_api_command_open_url } from '../lib/hybrid'
@@ -62,7 +62,9 @@ function open_koukuban_paypal() {
 <template>
   <div class="page">
     <div class="hero">
-      <img :src="hybrid" class="base" alt="" />
+      <div align="center">
+        <hybrid />
+      </div>
       <h1>{{t('common.appName')}}</h1>
       <MiuixText>{{version}}</MiuixText>
     </div>
