@@ -3,9 +3,12 @@ import { ref,onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getCurrentLangIndex, switchLocale, getSupportedLocales } from '../locales'
 import {MiuixCard,MiuixSmallTitle,MiuixText,MiuixSwitch,MiuixButton,MiuixRadioButtonPreference,MiuixDropdownPreference,MiuixInput,MiuixBasicComponent,MiuixIcon} from 'miuix-vue'
-import {FolderFill,MoveFile,Settings} from 'miuix-vue/icons'
+import {FolderFill,MoveFile,Settings,ChevronForward,type MiuixIconWeight} from 'miuix-vue/icons'
+import { Motion,AnimatePresence } from 'motion-v'
 import { run_hybird_api_command } from '../lib/hybrid';
 const { t } = useI18n()
+
+const expandSpring = { type: 'spring' as const, stiffness: 400, damping: 40 }
 
 const text1 = ref('')
 const text2 = ref('')
@@ -13,7 +16,8 @@ const display_list = ref<string[]>([])
 const lang_code = ref<string[]>([])
 const lang_dropdown_index = ref(0)
 
-const overlay_workmode = ref(0)
+const expand_overlay = ref(false)
+const overlay_workmode = ref('')
 const daemon = ref(false)
 const umount_disabled = ref(false)
 onMounted(async () => {
@@ -26,7 +30,7 @@ onMounted(async () => {
   const configs = await run_hybird_api_command('config-get')
   text1.value = configs.moduledir
   text2.value = configs.mountsource
-  overlay_workmode.value = configs.overlay_mode === 'ext4' ? 1 : 0
+  overlay_workmode.value = configs.overlay_mode
   umount_disabled.value = configs.disable_umount
   daemon.value = configs.daemon_startup_mode == 'persistent' ? true : false
 })
@@ -44,7 +48,7 @@ function handleChange(value: number) {
     <MiuixCard class="ex-card"> 
       <MiuixDropdownPreference :title="t('common.language')" :summary="lang_code[lang_dropdown_index]" v-model="lang_dropdown_index" :items="display_list" />
       <div style="padding: 12px;">
-        <MiuixButton @click="handleChange(lang_dropdown_index)">{{t('config.save')}}</MiuixButton>
+        <MiuixButton type="primary" @click="handleChange(lang_dropdown_index)">{{t('config.save')}}</MiuixButton>
       </div>
     </MiuixCard>
 
@@ -58,9 +62,7 @@ function handleChange(value: number) {
       <div style="padding: 0 16px 16px;">
         <MiuixInput v-model="text1" :label="t('config.moduleDir')" single-line />
       </div>
-    </MiuixCard>
 
-    <MiuixCard class="ex-card"> 
       <MiuixBasicComponent :title="t('config.mountSource')" :summary="t('config.mountSourceDesc')">
         <template #start>
           <MiuixIcon :icon="MoveFile" />
@@ -69,19 +71,25 @@ function handleChange(value: number) {
       <div style="padding: 0 16px 16px;">
         <MiuixInput v-model="text2" :label="t('config.mountSource')" single-line />
       </div>
-    </MiuixCard>
-
-    <MiuixCard class="ex-card"> 
-      <MiuixBasicComponent :title="t('config.overlayMode')" :summary="t('config.overlayModeDesc')">
+      <MiuixBasicComponent :title="t('config.overlayMode')" :summary="t('config.overlayModeDesc')" :clickable="true" @click="expand_overlay = !expand_overlay">
         <template #start>
           <MiuixIcon :icon="Settings" />
         </template>
+        <template #end>
+          <MiuixIcon :icon="ChevronForward" :size="16" :weight="normal" />
+        </template>
       </MiuixBasicComponent>
-      <MiuixRadioButtonPreference :model-value="overlay_workmode === 0" :title="t('config.mode_tmpfs')" :summary="t('config.mode_tmpfsDesc')" @select="overlay_workmode = 0"/>
-      <MiuixRadioButtonPreference :model-value="overlay_workmode === 1" :title="t('config.mode_ext4')" :summary="t('config.mode_ext4Desc')" @select="overlay_workmode = 1"/>
-    </MiuixCard>
+      <AnimatePresence :initial="false">
+        <Motion v-if="expand_overlay" class="ex-expand"
+              :initial="{ height: 0, opacity: 0 }"
+              :animate="{ height: 'auto', opacity: 1 }"
+              :exit="{ height: 0, opacity: 0 }"
+              :transition="expandSpring">
+          <MiuixRadioButtonPreference :model-value="overlay_workmode === 'tmpfs'" :title="t('config.mode_tmpfs')" :summary="t('config.mode_tmpfsDesc')" @select="overlay_workmode = 'tmpfs'"/>
+          <MiuixRadioButtonPreference :model-value="overlay_workmode === 'ext4'" :title="t('config.mode_ext4')" :summary="t('config.mode_ext4Desc')" @select="overlay_workmode = 'ext4'"/>
+        </Motion>
+      </AnimatePresence>
 
-    <MiuixCard class="ex-card">
       <MiuixBasicComponent> 
         <template #start>
           <MiuixText>{{t('config.disableUmount')}}</MiuixText>
@@ -90,9 +98,6 @@ function handleChange(value: number) {
           <MiuixSwitch v-model="umount_disabled" label="Enabled" />
         </template>
       </MiuixBasicComponent>
-    </MiuixCard>
-
-    <MiuixCard class="ex-card">
       <MiuixBasicComponent> 
         <template #start>
           <MiuixText>{{t('config.daemonStartupMode')}}</MiuixText>

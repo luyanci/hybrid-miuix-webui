@@ -2,10 +2,12 @@
 import { ref,onMounted,computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { MiuixSearchBar,MiuixCard,MiuixBasicComponent,MiuixSmallTitle,MiuixBottomSheet,MiuixRadioButtonPreference,MiuixArrowPreference,MiuixText,MiuixIcon } from 'miuix-vue'
-import { Close, Ok } from 'miuix-vue/icons'
+import { Motion,AnimatePresence } from 'motion-v'
 const { t } = useI18n()
 import { exec } from 'kernelsu'
 import { run_hybird_api_command } from '../lib/hybrid'
+
+const expandSpring = { type: 'spring' as const, stiffness: 400, damping: 40 }
 
 const searchQuery = ref('')
 const searchexpanded = ref(false)
@@ -56,33 +58,29 @@ onMounted(async () => {
     </div> 
     <div v-else v-for="module in filterModules" > 
       <MiuixCard class="ex-card">
-        <MiuixArrowPreference :title="module.name" @click='module.Bottomopen = true'>
+        <MiuixBasicComponent :title="module.name" :summary='module.id+" "+module.version' :clickable="true" @click='module.Bottomopen = !module.Bottomopen'>
           <template #end>
             <MiuixText type="body2" color="var(--m-color-on-surface-variant-actions)">{{module.is_mounted? "MOUNTED" : "ERROR"}}</MiuixText>
           </template>
-        </MiuixArrowPreference>
+        </MiuixBasicComponent>
+        <AnimatePresence :initial="false">
+          <Motion v-if="module.Bottomopen" class="ex-expand"
+                :initial="{ height: 0, opacity: 0 }"
+                :animate="{ height: 'auto', opacity: 1 }"
+                :exit="{ height: 0, opacity: 0 }"
+                :transition="expandSpring">
+            <MiuixBasicComponent :summary="module.description" /> 
+            <MiuixSmallTitle>{{t('modules.defaultMode')}}</MiuixSmallTitle>
+            <div class="ex-basic-row">
+              <MiuixRadioButtonPreference class="ex-row-child" :model-value='module.mode === "overlay"' :title="t('modules.modes.short.overlay')" :summary="t('modules.defaultTag')" @click='module.mode = "overlay"'/>
+              <MiuixRadioButtonPreference class="ex-row-child" :model-value='module.mode === "magic"' :title="t('modules.modes.short.magic')" :summary="t('modules.compatTag')" @click='module.mode = "magic"'/>
+            
+              <MiuixRadioButtonPreference class="ex-row-child" :model-value='module.mode === "kasumi"' :title="t('modules.modes.short.kasumi')" :summary="t('modules.nativeTag')" @click='module.mode = "kasumi"'/>
+              <MiuixRadioButtonPreference class="ex-row-child" :model-value='module.mode === "ignore"' :title="t('modules.modes.short.ignore')" :summary="t('modules.disableTag')" @click='module.mode = "ignore"'/>
+            </div>
+            </Motion>
+        </AnimatePresence>
       </MiuixCard>
-      
-      <MiuixBottomSheet v-model="module.Bottomopen" :title="module.name">
-        <template #start-action>
-          <MiuixIconButton aria-label="Cancel" @click="module.Bottomopen = false">
-            <MiuixIcon :icon="Close" :size="24" />
-          </MiuixIconButton>
-        </template>
-        <template #end-action>
-          <MiuixIconButton aria-label="Confirm" @click="module.Bottomopen = false">
-            <MiuixIcon :icon="Ok" :size="24" />
-          </MiuixIconButton>
-        </template>
-        <MiuixCard>
-          <MiuixBasicComponent :summary="module.description" /> 
-          <MiuixSmallTitle>{{t('modules.defaultMode')}}</MiuixSmallTitle>
-          <MiuixRadioButtonPreference :model-value='module.mode === "overlay"' :title="t('modules.modes.short.overlay')" :summary="t('modules.defaultTag')" @click='module.mode = "overlay"'/>
-          <MiuixRadioButtonPreference :model-value='module.mode === "magic"' :title="t('modules.modes.short.magic')" :summary="t('modules.compatTag')" @click='module.mode = "magic"'/>
-          <MiuixRadioButtonPreference :model-value='module.mode === "kasumi"' :title="t('modules.modes.short.kasumi')" :summary="t('modules.nativeTag')" @click='module.mode = "kasumi"'/>
-          <MiuixRadioButtonPreference :model-value='module.mode === "ignore"' :title="t('modules.modes.short.ignore')" :summary="t('modules.disableTag')" @click='module.mode = "ignore"'/>
-        </MiuixCard>
-      </MiuixBottomSheet>
     </div>
   </div>
 </template>
@@ -93,5 +91,13 @@ onMounted(async () => {
 }
 .ex-card {
   margin: 0 12px 12px;
+}
+.ex-basic-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ex-row-child {
+  flex: 1;
 }
 </style>

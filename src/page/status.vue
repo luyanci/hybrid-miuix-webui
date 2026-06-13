@@ -39,43 +39,54 @@ onMounted(async () => {
 
 <template>
   <div class="page">
-    <MiuixCard class="ex-card ex-card--pad"> 
-      <MiuixBasicComponent :title="t('status.storageTitle')" :summary="storage_mode">
+    <MiuixCard class="ex-card ex-card--pad"
+      show-indication
+      style="--m-card-color: var(--m-color-primary-variant)"> 
+      <MiuixBasicComponent :title="t('status.storageTitle')" :summary="storage_path">
         <template #start>
           <MiuixIcon :icon="Info" />
         </template>
         <template #end>
-          <MiuixText>{{storage_path}}</MiuixText>
-        </template>
-      </MiuixBasicComponent>
-      <MiuixBasicComponent :title="t('status.moduleActive')">
-        <template #end>
-          <MiuixText>{{actived_count}}</MiuixText>
-        </template>
-      </MiuixBasicComponent>
-            <MiuixBasicComponent :title="t('status.mountBase')">
-        <template #end>
-          <MiuixText>{{mount_source}}</MiuixText>
+          <MiuixText>{{storage_mode}}</MiuixText>
         </template>
       </MiuixBasicComponent>
     </MiuixCard>
+    <div class="ex-card-row">
+      <MiuixCard class="ex-card--pad ex-grow">
+        <MiuixBasicComponent :title="t('status.moduleActive')">
+          <template #end>
+            <MiuixText :size="18" weight="medium"><b>{{actived_count}}</b></MiuixText>
+          </template>
+        </MiuixBasicComponent>
+      </MiuixCard>
+      <MiuixCard class="ex-card--pad ex-grow">
+        <MiuixBasicComponent :title="t('status.mountBase')">
+          <template #end>
+            <MiuixText :size="18" weight="medium"><b>{{mount_source}}</b></MiuixText>
+          </template>
+        </MiuixBasicComponent>
+      </MiuixCard>
+
+    </div>
     <MiuixSmallTitle :text="t('status.modeStats')" />
     <MiuixCard class="ex-card">
-      <MiuixBasicComponent title="Overlay">
-        <template #end>
-          <MiuixText>{{overlay_count}}</MiuixText>
-        </template>
-      </MiuixBasicComponent>
-      <MiuixBasicComponent title="Magic">
-        <template #end>
-          <MiuixText>{{magic_count}}</MiuixText>
-        </template>
-      </MiuixBasicComponent>
-      <MiuixBasicComponent title="Kasumi">
-        <template #end>
-          <MiuixText>{{kasumi_count}}</MiuixText>
-        </template>
-      </MiuixBasicComponent>
+      <div class="ex-basic-row ex-grow">
+        <MiuixBasicComponent title="Overlay">
+          <template #end>
+            <MiuixText>{{overlay_count}}</MiuixText>
+          </template>
+        </MiuixBasicComponent>
+        <MiuixBasicComponent title="Magic">
+          <template #end>
+            <MiuixText>{{magic_count}}</MiuixText>
+          </template>
+        </MiuixBasicComponent>
+        <MiuixBasicComponent title="Kasumi">
+          <template #end>
+            <MiuixText>{{kasumi_count}}</MiuixText>
+          </template>
+        </MiuixBasicComponent>
+      </div>
     </MiuixCard>
 
     <MiuixSmallTitle :text="t('status.sysInfoTitle')" />
@@ -95,5 +106,17 @@ onMounted(async () => {
   &--pad .m-card {
     padding: 16px;
   }
+}
+.ex-card-row {
+  display: flex;
+  gap: 12px;
+  margin: 0 12px 12px;
+}
+.ex-basic-row {
+  display: flex;
+  gap: 12px;
+}
+.ex-grow {
+  flex: 1;
 }
 </style>
