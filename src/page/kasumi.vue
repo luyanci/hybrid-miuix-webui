@@ -23,16 +23,6 @@ const kasumi = ref({
       </MiuixBasicComponent>
     </MiuixCard>
 
-    <MiuixCard class="ex-card">
-      <MiuixBasicComponent> 
-        <template #start>
-          <MiuixText>{{t('config.kasumiMasterSwitch')}}</MiuixText>
-        </template>
-        <template #end>
-          <MiuixSwitch v-model="kasumi.enabled" label="Enabled" />
-        </template>
-      </MiuixBasicComponent>
-    </MiuixCard>
   </div>
 </template>
 
