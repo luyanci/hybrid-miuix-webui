@@ -1,6 +1,5 @@
 import { exec } from 'kernelsu'
 import { parse } from 'json5'
-// returns stdout (as json) dont Promise
 export async function run_hybird_api_command(subcommand: string) {
   const data = await exec("./hybrid-mount api " + subcommand,
     {cwd: "/data/adb/modules/hybrid_mount"})
@@ -40,7 +39,7 @@ export async function run_hybird_daemon_status_command() {
 export async function run_hybird_api_command_open_url(url: string) {
   await exec("./hybrid-mount api open-url " + url,
     {cwd: "/data/adb/modules/hybrid_mount"})
-    .then((data) => {
+    .then(() => {
       console.info("open url "+url)
     })
 }

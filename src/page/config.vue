@@ -2,7 +2,7 @@
 import { ref,onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getCurrentLangIndex, switchLocale, getSupportedLocales } from '../locales'
-import {MiuixCard,MiuixSmallTitle,MiuixText,MiuixSwitch,MiuixButton,MiuixRadioButtonPreference,MiuixDropdownPreference,MiuixInput,MiuixBasicComponent,MiuixIcon} from 'miuix-vue'
+import {MiuixCard,MiuixSmallTitle,MiuixText,MiuixSwitch,MiuixButton,MiuixRadioButtonPreference,MiuixDropdownPreference,MiuixInput,MiuixBasicComponent,MiuixIcon,MiuixDialog,showSnackbar} from 'miuix-vue'
 import {FolderFill,MoveFile,Settings,ChevronForward,type MiuixIconWeight} from 'miuix-vue/icons'
 import { Motion,AnimatePresence } from 'motion-v'
 import { run_hybird_api_command } from '../lib/hybrid';
@@ -20,6 +20,8 @@ const expand_overlay = ref(false)
 const overlay_workmode = ref('')
 const daemon = ref(false)
 const umount_disabled = ref(false)
+const reset_req = ref(false)
+
 onMounted(async () => {
   const supported_locales = await getSupportedLocales()
   const lang_index= await getCurrentLangIndex()
@@ -40,6 +42,15 @@ function handleChange(value: number) {
   window.location.reload()
 }
 
+function reset_config() {
+  run_hybird_api_command('config-reset').then(() => {
+    showSnackbar({message: t('config.resetSuccess')})
+  })
+  .finally(() => {
+    reset_req.value = false
+  })
+}
+
 </script>
 
 <template>
@@ -47,8 +58,8 @@ function handleChange(value: number) {
     <MiuixSmallTitle :text="t('config.webui')" />
     <MiuixCard class="ex-card"> 
       <MiuixDropdownPreference :title="t('common.language')" :summary="lang_code[lang_dropdown_index]" v-model="lang_dropdown_index" :items="display_list" />
-      <div style="padding: 12px;">
-        <MiuixButton type="primary" @click="handleChange(lang_dropdown_index)">{{t('config.save')}}</MiuixButton>
+      <div style="padding: 12px; display: flex;">
+        <MiuixButton class="ex-glow" type="primary" @click="handleChange(lang_dropdown_index)">{{t('config.save')}}</MiuixButton>
       </div>
     </MiuixCard>
 
@@ -106,12 +117,40 @@ function handleChange(value: number) {
           <MiuixSwitch v-model="daemon" label="Enabled" />
         </template>
       </MiuixBasicComponent>
+      <div style="padding: 12px; display: flex;">
+        <MiuixButton class="ex-glow" @click="reset_req = true">{{t('config.resetConfig')}}</MiuixButton>
+        <MiuixButton class="ex-glow" type="primary" @click='console.log("save")'>{{t('config.save')}}</MiuixButton>
+      </div>
     </MiuixCard>
+
+    <MiuixDialog 
+    v-model="reset_req"
+    :title="t('config.resetConfigTitle')"
+    :summary="t('config.resetConfigConfirm')"
+    @close="reset_req = false"> 
+    <template #default="{close}">
+      <div class="ex-dialog-actions"> 
+        <MiuixButton class="ex-grow" @click="close">{{t('common.cancel')}}</MiuixButton>
+        <MiuixButton class="ex-grow" type="primary" @click="reset_config()">{{t('config.resetConfig')}}</MiuixButton>
+      </div>
+    </template>
+  </MiuixDialog>
+
   </div>
 </template>
 
 <style scoped>
 .ex-card {
   margin: 0 12px 12px;
+}
+.ex-dialog-actions {
+  display: flex;
+  gap: 12px;
+}
+.ex-glow {
+  flex: 1;
+}
+.ex-grow {
+  flex: 1;
 }
 </style>

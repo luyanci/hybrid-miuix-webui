@@ -41,7 +41,13 @@ axios.get('https://api.github.com/repos/hybrid-mount/meta-hybrid_mount/contribut
     } else {
     contributors.value[i].name = response.data.name
     }
-  })}
+  })
+  .catch(function (error) {
+    console.error(error)
+    contributors.value[i].bio = t('info.loadFail')
+    contributors.value[i].name = contributors.value[i].login
+  })
+}
 })
 .catch(function (error) {
   console.error(error)

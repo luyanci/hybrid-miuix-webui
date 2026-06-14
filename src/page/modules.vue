@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { ref,onMounted,computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { MiuixSearchBar,MiuixCard,MiuixBasicComponent,MiuixSmallTitle,MiuixBottomSheet,MiuixRadioButtonPreference,MiuixArrowPreference,MiuixText,MiuixIcon } from 'miuix-vue'
+import { MiuixSearchBar,MiuixCard,MiuixBasicComponent,MiuixSmallTitle,MiuixBottomSheet,MiuixRadioButtonPreference,MiuixButton,MiuixText,MiuixIcon } from 'miuix-vue'
 import { Motion,AnimatePresence } from 'motion-v'
 const { t } = useI18n()
 import { exec } from 'kernelsu'
-import { run_hybird_api_command } from '../lib/hybrid'
+import { run_hybird_api_command,run_hybird_daemon_status_command } from '../lib/hybrid'
 
 const expandSpring = { type: 'spring' as const, stiffness: 400, damping: 40 }
 
 const searchQuery = ref('')
 const searchexpanded = ref(false)
 const modules_list = ref([])
+const kasumi_supported = ref(false)
 
 const filterModules = computed( () => {
   if (searchQuery.value.trim() === '') {
@@ -24,6 +25,13 @@ const filterModules = computed( () => {
   module.id.toLowerCase().includes(query))
 })
 
+
+
+function run_hybird_api_command_modules_set_mode(module_id, mode) {
+  return run_hybird_api_command(`modules-apply ${module_id} ${mode}`)
+}
+
+
 async function get_module_properties(module) {
   const module_properties_path = `${module.source_path}/module.prop`
   const data = (await exec(`cat ${module_properties_path}`)).stdout
@@ -31,6 +39,9 @@ async function get_module_properties(module) {
 }
 
 onMounted(async () => { 
+  await run_hybird_daemon_status_command().then(data => {
+  kasumi_supported.value = data.kasumi.available
+  })
   modules_list.value = await run_hybird_api_command('modules-list')
   for (let i = 0; i < modules_list.value.length; i++) {
     const a = await get_module_properties(modules_list.value[i])
@@ -41,7 +52,6 @@ onMounted(async () => {
     modules_list.value[i]['Bottomopen'] = false
   }
   console.info(modules_list.value)
-
 })
 </script>
 
@@ -75,8 +85,13 @@ onMounted(async () => {
               <MiuixRadioButtonPreference class="ex-row-child" :model-value='module.mode === "overlay"' :title="t('modules.modes.short.overlay')" :summary="t('modules.defaultTag')" @click='module.mode = "overlay"'/>
               <MiuixRadioButtonPreference class="ex-row-child" :model-value='module.mode === "magic"' :title="t('modules.modes.short.magic')" :summary="t('modules.compatTag')" @click='module.mode = "magic"'/>
             
-              <MiuixRadioButtonPreference class="ex-row-child" :model-value='module.mode === "kasumi"' :title="t('modules.modes.short.kasumi')" :summary="t('modules.nativeTag')" @click='module.mode = "kasumi"'/>
+              <MiuixRadioButtonPreference v-if="kasumi_supported" class="ex-row-child" :model-value='module.mode === "kasumi"' :title="t('modules.modes.short.kasumi')" :summary="t('modules.nativeTag')" @click='module.mode = "kasumi"'/>
               <MiuixRadioButtonPreference class="ex-row-child" :model-value='module.mode === "ignore"' :title="t('modules.modes.short.ignore')" :summary="t('modules.disableTag')" @click='module.mode = "ignore"'/>
+              <MiuixRadioButtonPreference v-if="!kasumi_supported" disabled="true" class="ex-row-child"/>
+
+            </div>
+            <div style="display: flex;">
+              <MiuixButton class="ex-glow" type="primary" @click="run_hybird_api_command_modules_set_mode(module.id,module.mode)">{{t('modules.save')}}</MiuixButton>
             </div>
             </Motion>
         </AnimatePresence>
@@ -98,6 +113,9 @@ onMounted(async () => {
   flex-wrap: wrap;
 }
 .ex-row-child {
+  flex: 1;
+}
+.ex-glow {
   flex: 1;
 }
 </style>
