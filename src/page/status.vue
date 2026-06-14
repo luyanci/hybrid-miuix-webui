@@ -42,12 +42,12 @@ onMounted(async () => {
     <MiuixCard class="ex-card ex-card--pad"
       show-indication
       style="--m-card-color: var(--m-color-primary-variant)"> 
-      <MiuixBasicComponent :title="t('status.storageTitle')" :summary="storage_path">
+      <MiuixBasicComponent :title="t('status.storageTitle')" titleColor="var(--m-color-on-primary-variant)" :summary="storage_path" summaryColor="var(--m-color-on-primary-variant)">
         <template #start>
-          <MiuixIcon :icon="Info" />
+          <MiuixIcon color="var(--m-color-on-primary-variant)" :icon="Info" />
         </template>
         <template #end>
-          <MiuixText>{{storage_mode}}</MiuixText>
+          <MiuixText style="color:var(--m-color-on-primary-variant);" >{{storage_mode}}</MiuixText>
         </template>
       </MiuixBasicComponent>
     </MiuixCard>

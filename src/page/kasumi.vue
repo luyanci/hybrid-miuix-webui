@@ -17,9 +17,17 @@ const expandSpring = { type: 'spring' as const, stiffness: 400, damping: 40 }
     <MiuixCard class="ex-card ex-card--pad"
       show-indication
       style="--m-card-color: var(--m-color-error)"> 
-      <MiuixBasicComponent :title="t('kasumi.title')" :summary="t('kasumi.statusDisabled')">
+      <MiuixBasicComponent :title="t('kasumi.title')" titleColor="var(--m-color-on-error)" :summary="t('kasumi.statusDisabled')" summaryColor="var(--m-color-on-error)">
         <template #start>
-          <MiuixIcon :icon="Info" />
+          <MiuixIcon :icon="Info" color="var(--m-color-on-error)"/>
+        </template>
+      </MiuixBasicComponent>
+
+    </MiuixCard>
+    <MiuixCard class="ex-card">
+      <MiuixBasicComponent> 
+        <template #start>
+          <MiuixText>{{t('config.kasumiMasterSwitch')}}</MiuixText>
         </template>
         <template #end>
           <MiuixSwitch v-model="kasumi.enabled" label="Enabled" />
