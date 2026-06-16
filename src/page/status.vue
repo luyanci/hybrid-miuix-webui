@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref,onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
-import {MiuixCard,MiuixSmallTitle,MiuixBasicComponent,MiuixIcon} from 'miuix-vue'
+import { MiuixCard, MiuixSmallTitle, MiuixBasicComponent, MiuixIcon, MiuixText } from 'miuix-vue'
 import { Info } from 'miuix-vue/icons'
-import { run_hybird_api_command,run_hybird_daemon_status_command } from '../lib/hybrid'
+import { API } from '../lib/api'
+import { ENABLE_KASUMI } from '../lib/constants_gen'
 
 const storage_path = ref('/dev/homo/114514');
 const storage_mode = ref('HomoFS');
@@ -15,24 +16,51 @@ const mount_source = ref('HOMO');
 const overlay_count = ref(1);
 const magic_count = ref(1);
 const kasumi_count = ref(4);
+const activeMounts = ref<string[]>([]);
 
 
 onMounted(async () => {
-  const info = await run_hybird_api_command('system-info');
-  kernel_version.value = info.kernel;
-  selinux.value = info.selinux;
-  const storage_info = await run_hybird_api_command('storage');
-  storage_mode.value = storage_info.mode;
-  storage_path.value = storage_info.path;
-  const mounts = await run_hybird_api_command('modules-list');
-  actived_count.value = mounts.length;
-  const configs = await run_hybird_api_command('config-get');
-  mount_source.value = configs.mountsource;
-  const daemon_status = await run_hybird_daemon_status_command();
-  const mode_stats = daemon_status.mode_stats
-  overlay_count.value = mode_stats.overlayfs;
-  magic_count.value = mode_stats.magicmount;
-  kasumi_count.value = mode_stats.kasumi;
+  try {
+    // Wake daemon first
+    await API.wakeDaemon();
+    
+    // Get initial payload with all data
+    const initPayload = await API.init();
+    
+    // Set system info
+    if (initPayload.system_info) {
+      kernel_version.value = initPayload.system_info.kernel;
+      selinux.value = initPayload.system_info.selinux;
+      activeMounts.value = initPayload.system_info.activeMounts || [];
+    }
+    
+    // Set storage info
+    if (initPayload.status) {
+      storage_mode.value = initPayload.status.storage_mode || 'unknown';
+      storage_path.value = initPayload.status.mount_point || '/data/adb/hybrid-mount/mnt';
+      
+      // Get mode stats
+      const modeStats = initPayload.status.mode_stats;
+      if (modeStats) {
+        overlay_count.value = modeStats.overlayfs || 0;
+        magic_count.value = modeStats.magicmount || 0;
+        kasumi_count.value = ENABLE_KASUMI ? (modeStats.kasumi || 0) : 0;
+      }
+      
+      // Calculate active count
+      const overlay = initPayload.status.overlay_modules?.length || 0;
+      const magic = initPayload.status.magic_modules?.length || 0;
+      const kasumi = initPayload.status.kasumi_modules?.length || 0;
+      actived_count.value = overlay + magic + kasumi;
+    }
+    
+    // Set config info
+    if (initPayload.config) {
+      mount_source.value = initPayload.config.mountsource;
+    }
+  } catch (e) {
+    console.error('Failed to load status data:', e);
+  }
 });
 
 </script>

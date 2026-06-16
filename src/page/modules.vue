@@ -1,57 +1,61 @@
 <script setup lang="ts">
-import { ref,onMounted,computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { MiuixSearchBar,MiuixCard,MiuixBasicComponent,MiuixSmallTitle,MiuixBottomSheet,MiuixRadioButtonPreference,MiuixButton,MiuixText,MiuixIcon } from 'miuix-vue'
-import { Motion,AnimatePresence } from 'motion-v'
+import { MiuixSearchBar, MiuixCard, MiuixBasicComponent, MiuixSmallTitle, MiuixRadioButtonPreference, MiuixButton, MiuixText } from 'miuix-vue'
+import { Motion, AnimatePresence } from 'motion-v'
 const { t } = useI18n()
-import { exec } from 'kernelsu'
-import { run_hybird_api_command,run_hybird_daemon_status_command } from '../lib/hybrid'
+import { API } from '../lib/api'
+import type { Module, MountMode } from '../lib/types'
+
+// Extended module type with UI state
+type ModuleWithUI = Module & {
+  Bottomopen?: boolean;
+}
 
 const expandSpring = { type: 'spring' as const, stiffness: 400, damping: 40 }
 
 const searchQuery = ref('')
 const searchexpanded = ref(false)
-const modules_list = ref([])
+const modules_list = ref<ModuleWithUI[]>([])
 const kasumi_supported = ref(false)
 
-const filterModules = computed( () => {
+const filterModules = computed(() => {
   if (searchQuery.value.trim() === '') {
     return modules_list.value
   }
-  const query=searchQuery.value.toLowerCase()
-  return modules_list.value.filter(module => 
-  module.name.toLowerCase().includes(query) ||
-  module.description.toLowerCase().includes(query) ||
-  module.id.toLowerCase().includes(query))
+  const query = searchQuery.value.toLowerCase()
+  return modules_list.value.filter(module =>
+    module.name.toLowerCase().includes(query) ||
+    module.description.toLowerCase().includes(query) ||
+    module.id.toLowerCase().includes(query)
+  )
 })
 
-
-
-function run_hybird_api_command_modules_set_mode(module_id, mode) {
-  return run_hybird_api_command(`modules-apply ${module_id} ${mode}`)
+function run_hybird_api_command_modules_set_mode(module_id: string, mode: MountMode) {
+  return API.saveModuleRules(module_id, {
+    default_mode: mode,
+    paths: {}
+  });
 }
 
-
-async function get_module_properties(module) {
-  const module_properties_path = `${module.source_path}/module.prop`
-  const data = (await exec(`cat ${module_properties_path}`)).stdout
-  return data
-}
-
-onMounted(async () => { 
-  await run_hybird_daemon_status_command().then(data => {
-  kasumi_supported.value = data.kasumi.available
-  })
-  modules_list.value = await run_hybird_api_command('modules-list')
-  for (let i = 0; i < modules_list.value.length; i++) {
-    const a = await get_module_properties(modules_list.value[i])
-    a.split('\n').forEach(line => {
-      const [key, value] = line.split('=')
-      modules_list.value[i][key] = value
-    })
-    modules_list.value[i]['Bottomopen'] = false
+onMounted(async () => {
+  try {
+    // Check kasumi availability from init
+    const initPayload = await API.init();
+    if (initPayload.kasumi_status) {
+      kasumi_supported.value = initPayload.kasumi_status.available;
+    }
+    
+    // Load modules
+    const modules = await API.scanModules();
+    
+    // Add Bottomopen property for UI expansion state
+    modules_list.value = modules.map(m => ({ ...m, Bottomopen: false }));
+    
+    console.info(modules_list.value);
+  } catch (e) {
+    console.error('Failed to load modules:', e);
   }
-  console.info(modules_list.value)
 })
 </script>
 

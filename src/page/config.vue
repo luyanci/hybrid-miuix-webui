@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref,onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getCurrentLangIndex, switchLocale, getSupportedLocales } from '../locales'
-import {MiuixCard,MiuixSmallTitle,MiuixText,MiuixSwitch,MiuixButton,MiuixRadioButtonPreference,MiuixDropdownPreference,MiuixInput,MiuixBasicComponent,MiuixIcon,MiuixDialog,showSnackbar} from 'miuix-vue'
-import {FolderFill,MoveFile,Settings,ChevronForward,type MiuixIconWeight} from 'miuix-vue/icons'
-import { Motion,AnimatePresence } from 'motion-v'
-import { run_hybird_api_command } from '../lib/hybrid';
+import { MiuixCard, MiuixSmallTitle, MiuixText, MiuixSwitch, MiuixButton, MiuixRadioButtonPreference, MiuixDropdownPreference, MiuixInput, MiuixBasicComponent, MiuixIcon, MiuixDialog, showSnackbar } from 'miuix-vue'
+import { FolderFill, MoveFile, Settings, ChevronForward } from 'miuix-vue/icons'
+import { Motion, AnimatePresence } from 'motion-v'
+import { API } from '../lib/api';
+import type { AppConfig, OverlayMode } from '../lib/types';
 const { t } = useI18n()
 
 const expandSpring = { type: 'spring' as const, stiffness: 400, damping: 40 }
@@ -17,24 +18,32 @@ const lang_code = ref<string[]>([])
 const lang_dropdown_index = ref(0)
 
 const expand_overlay = ref(false)
-const overlay_workmode = ref('')
+const overlay_workmode = ref<OverlayMode>('tmpfs')
 const daemon = ref(false)
 const umount_disabled = ref(false)
 const reset_req = ref(false)
 
-onMounted(async () => {
-  const supported_locales = await getSupportedLocales()
-  const lang_index= await getCurrentLangIndex()
-  lang_dropdown_index.value = lang_index
-  display_list.value = supported_locales.map(supported_locales => supported_locales.display)
-  lang_code.value = supported_locales.map(supported_locales => supported_locales.code)
+let currentConfig: AppConfig | null = null;
 
-  const configs = await run_hybird_api_command('config-get')
-  text1.value = configs.moduledir
-  text2.value = configs.mountsource
-  overlay_workmode.value = configs.overlay_mode
-  umount_disabled.value = configs.disable_umount
-  daemon.value = configs.daemon_startup_mode == 'persistent' ? true : false
+onMounted(async () => {
+  try {
+    // Load supported locales
+    const supported_locales = await getSupportedLocales()
+    const lang_index = await getCurrentLangIndex()
+    lang_dropdown_index.value = lang_index
+    display_list.value = supported_locales.map(supported_locales => supported_locales.display)
+    lang_code.value = supported_locales.map(supported_locales => supported_locales.code)
+
+    // Load config from API
+    currentConfig = await API.loadConfig();
+    text1.value = currentConfig.moduledir
+    text2.value = currentConfig.mountsource
+    overlay_workmode.value = currentConfig.overlay_mode
+    umount_disabled.value = currentConfig.disable_umount
+    daemon.value = currentConfig.daemon_startup_mode === 'persistent'
+  } catch (e) {
+    console.error('Failed to load config:', e);
+  }
 })
 
 function handleChange(value: number) {
@@ -42,13 +51,44 @@ function handleChange(value: number) {
   window.location.reload()
 }
 
+async function save_config() {
+  if (!currentConfig) return;
+  try {
+    const newConfig: AppConfig = {
+      ...currentConfig,
+      moduledir: text1.value,
+      mountsource: text2.value,
+      overlay_mode: overlay_workmode.value,
+      disable_umount: umount_disabled.value,
+      daemon_startup_mode: daemon.value ? 'persistent' : 'on-demand',
+    };
+    await API.saveConfig(newConfig);
+    currentConfig = newConfig;
+    showSnackbar({ message: t('common.saved') || 'Config saved' });
+  } catch (e) {
+    console.error('Failed to save config:', e);
+    showSnackbar({ message: 'Failed to save config' });
+  }
+}
+
 function reset_config() {
-  run_hybird_api_command('config-reset').then(() => {
-    showSnackbar({message: t('config.resetSuccess')})
-  })
-  .finally(() => {
-    reset_req.value = false
-  })
+  reset_req.value = false;
+  API.resetConfig().then(() => {
+    showSnackbar({ message: t('config.resetSuccess') || 'Config reset' });
+    // Reload config after reset
+    return API.loadConfig();
+  }).then((config) => {
+    if (config) {
+      currentConfig = config;
+      text1.value = config.moduledir;
+      text2.value = config.mountsource;
+      overlay_workmode.value = config.overlay_mode;
+      umount_disabled.value = config.disable_umount;
+      daemon.value = config.daemon_startup_mode === 'persistent';
+    }
+  }).catch((e) => {
+    console.error('Failed to reset config:', e);
+  });
 }
 
 </script>
@@ -87,7 +127,7 @@ function reset_config() {
           <MiuixIcon :icon="Settings" />
         </template>
         <template #end>
-          <MiuixIcon :icon="ChevronForward" :size="16" :weight="normal" />
+          <MiuixIcon :icon="ChevronForward" :size="16" />
         </template>
       </MiuixBasicComponent>
       <AnimatePresence :initial="false">
@@ -119,7 +159,7 @@ function reset_config() {
       </MiuixBasicComponent>
       <div style="padding: 12px; display: flex;">
         <MiuixButton class="ex-glow" @click="reset_req = true">{{t('config.resetConfig')}}</MiuixButton>
-        <MiuixButton class="ex-glow" type="primary" @click='console.log("save")'>{{t('config.save')}}</MiuixButton>
+        <MiuixButton class="ex-glow" type="primary" @click="save_config">{{t('config.save')}}</MiuixButton>
       </div>
     </MiuixCard>
 
