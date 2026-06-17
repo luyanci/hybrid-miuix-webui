@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { 
   MiuixSnackbarHost,
   MiuixScrollArea,
   MiuixIcon,
   MiuixNavigationBar,
-  type MiuixNavigationItem,
   MiuixTopAppBar,
   MiuixIconButton,
   MiuixButton,
@@ -18,7 +17,7 @@ import {
   Info,
   Folder,
   Close2  } from 'miuix-vue/icons'
-import { run_hybird_api_command } from './lib/hybrid.ts'
+import { API } from './lib/api'
 
 import status from './page/status.vue'
 import config from './page/config.vue'
@@ -64,8 +63,30 @@ function onPageEnter(): void {
 }
 
 function reboot_system(): void {
-    run_hybird_api_command('reboot')
+    API.reboot()
+    rebootreq_click.value = false
 }
+
+const bottomBarRef = ref<HTMLElement | null>(null)
+let barObserver: ResizeObserver | null = null
+
+function syncSnackbarInset(): void {
+  const h = bottomBarRef.value?.offsetHeight ?? 0
+  document.documentElement.style.setProperty('--m-snackbar-inset-bottom', `${h}px`)
+}
+
+onMounted(() => {
+  if (bottomBarRef.value) {
+    barObserver = new ResizeObserver(syncSnackbarInset)
+    barObserver.observe(bottomBarRef.value)
+  }
+  syncSnackbarInset()
+})
+
+onBeforeUnmount(() => {
+  barObserver?.disconnect()
+  document.documentElement.style.removeProperty('--m-snackbar-inset-bottom')
+})
 </script>
 
 <template>
@@ -87,7 +108,7 @@ function reboot_system(): void {
       </Transition>
     </MiuixScrollArea>
   
-    <div class="app__bottom">
+    <div ref="bottomBarRef" class="app__bottom">
       <MiuixNavigationBar v-model="navindex" :items="navItems">
         <template #icon="{ index }">
           <MiuixIcon :icon="navicoms[index]" :size="26" />
