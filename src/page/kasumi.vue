@@ -19,7 +19,7 @@ async function toggleKasumiEnabled(enabled: boolean) {
     await API.setKasumiEnabled(enabled);
     // Reload status after toggle
     kasumi.value = await API.getKasumiStatus();
-    showSnackbar({ message: enabled ? t('kasumi.enabled') || 'Kasumi enabled' : t('kasumi.disabled') || 'Kasumi disabled' });
+    showSnackbar({ message: enabled ? t('config.kasumiEnabledSuccess') || 'Kasumi enabled' : t('config.kasumiDisabledSuccess') || 'Kasumi disabled' });
   } catch (e) {
     console.error('Failed to toggle kasumi:', e);
   }
@@ -49,7 +49,7 @@ onMounted(async () => {
             <MiuixIcon :icon="Close" color="var(--m-color-on-error)"/>
           </template>
           <template #end>
-            <MiuixText style="color:var(--m-color-on-error);"><b>{{!kasumi?.available ? t('kasumi.statusUnavailable') : t('kasumi.statusDisabled')}}</b></MiuixText>
+            <MiuixText style="color:var(--m-color-on-error);"><b>{{kasumi?.available ? t('kasumi.statusUnavailable') : t('kasumi.statusDisabled')}}</b></MiuixText>
           </template>
         </MiuixBasicComponent>
       </MiuixCard>
@@ -63,7 +63,7 @@ onMounted(async () => {
             <MiuixIcon :icon="Info" color="var(--m-color-on-primary-variant)"/>
           </template>
           <template #end>
-            <MiuixText :size="18" weight="medium"><b>{{t('kasumi.statusWorking')}}</b></MiuixText>
+            <MiuixText :size="18" weight="medium" style="color:var(--m-color-on-primary-variant);">{{t('kasumi.statusWorking')}}</MiuixText>
           </template>
         </MiuixBasicComponent>
       </MiuixCard>
@@ -91,7 +91,7 @@ onMounted(async () => {
           <MiuixText>{{t('config.kasumiMasterSwitch')}}</MiuixText>
         </template>
         <template #end>
-          <MiuixSwitch :model-value="kasumi?.config?.enabled" label="Enabled" :disabled="!kasumi?.available" @update:model-value="toggleKasumiEnabled" />
+          <MiuixSwitch :model-value="kasumi?.config?.enabled" label="Enabled" :disabled="kasumi?.available && !kasumi?.config?.enabled" @update:model-value="toggleKasumiEnabled" />
         </template>
       </MiuixBasicComponent>
     </MiuixCard>
@@ -107,6 +107,7 @@ onMounted(async () => {
                 <MiuixText :size="18" weight="medium">{{t('kasumi.autoloadOn')}}</MiuixText>
               </template>
             </MiuixBasicComponent>
+            <AnimatePresence :initial="false">
             <Motion v-if="show_lkm_settings" class="ex-expand"
             :initial="{ height: 0, opacity: 0 }"
             :animate="{ height: 'auto', opacity: 1 }"
@@ -118,6 +119,7 @@ onMounted(async () => {
                 </template>
               </MiuixBasicComponent>
             </Motion>
+            </AnimatePresence>
           </MiuixCard>
       </Motion>
     </AnimatePresence>
@@ -139,5 +141,12 @@ onMounted(async () => {
 }
 .ex-expand {
   overflow: hidden;
+}
+.ex-basic-row {
+  display: flex;
+  gap: 12px;
+}
+.ex-grow {
+  flex: 1;
 }
 </style>

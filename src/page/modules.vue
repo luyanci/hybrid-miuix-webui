@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { MiuixSearchBar, MiuixCard, MiuixBasicComponent, MiuixSmallTitle, MiuixRadioButtonPreference, MiuixButton, MiuixText } from 'miuix-vue'
+import { showSnackbar,MiuixSearchBar, MiuixCard, MiuixBasicComponent, MiuixSmallTitle, MiuixRadioButtonPreference, MiuixButton, MiuixText, MiuixIcon } from 'miuix-vue'
+import { Close } from 'miuix-vue/icons'
 import { Motion, AnimatePresence } from 'motion-v'
 const { t } = useI18n()
 import { API } from '../lib/api'
@@ -21,10 +22,11 @@ const kasumi_supported = ref(false)
 
 const filterModules = computed(() => {
   if (searchQuery.value.trim() === '') {
-    return modules_list.value
+    return modules_list.value.filter(module => module.enabled)
   }
   const query = searchQuery.value.toLowerCase()
   return modules_list.value.filter(module =>
+    module.enabled &&
     module.name.toLowerCase().includes(query) ||
     module.description.toLowerCase().includes(query) ||
     module.id.toLowerCase().includes(query)
@@ -35,7 +37,13 @@ function run_hybird_api_command_modules_set_mode(module_id: string, mode: MountM
   return API.saveModuleRules(module_id, {
     default_mode: mode,
     paths: {}
-  });
+  }).finally(
+    () => {
+      showSnackbar({
+        message: t('modules.saveSuccess'),
+      })
+    }
+  )
 }
 
 onMounted(async () => {
@@ -68,13 +76,14 @@ onMounted(async () => {
       </MiuixSearchBar>
     </div>
     <div v-if="modules_list.length === 0 || filterModules.length === 0" align="center" >
-      <MiuixText class="ex-card">{{t('modules.emptyState')}}</MiuixText>
+      <MiuixText type="subtitle" class="ex-card">{{t('modules.emptyState')}}</MiuixText>
     </div> 
     <div v-else v-for="module in filterModules" > 
       <MiuixCard class="ex-card">
-        <MiuixBasicComponent :title="module.name" :summary='module.id+" "+module.version' :clickable="true" @click='module.Bottomopen = !module.Bottomopen'>
+        <MiuixBasicComponent :title="module.name" :summary='module.id + " " + module.version' :clickable="true" @click='module.Bottomopen = !module.Bottomopen'>
           <template #end>
-            <MiuixText type="body2" color="var(--m-color-on-surface-variant-actions)">{{module.is_mounted? "MOUNTED" : "ERROR"}}</MiuixText>
+            <MiuixText v-if="module.mount_error" type="body2" color="var(--m-color-error)">{{t('modules.mountError')}}</MiuixText>
+            <MiuixText v-else type="body2" color="var(--m-color-on-surface-variant-actions)">{{module.is_mounted? t('modules.modes.'+module.mode) : t("modules.modes.unmounted")}}</MiuixText>
           </template>
         </MiuixBasicComponent>
         <AnimatePresence :initial="false">
@@ -84,6 +93,14 @@ onMounted(async () => {
                 :exit="{ height: 0, opacity: 0 }"
                 :transition="expandSpring">
             <MiuixBasicComponent :summary="module.description" /> 
+            <MiuixCard v-if="module.mount_error" style="--m-card-color: var(--m-color-error)">
+              <MiuixBasicComponent :title="t('modules.mountError') + ': ' + module.mount_error" titleColor="var(--m-color-on-error)" :summary="t('modules.suggestIgnoreHint')" summaryColor="var(--m-color-on-error)">
+                <template #start>
+                  <MiuixIcon :icon="Close" color="var(--m-color-on-error)"/>
+                </template>
+
+              </MiuixBasicComponent> 
+            </MiuixCard>
             <MiuixSmallTitle>{{t('modules.defaultMode')}}</MiuixSmallTitle>
             <div class="ex-basic-row">
               <MiuixRadioButtonPreference class="ex-row-child" :model-value='module.mode === "overlay"' :title="t('modules.modes.short.overlay')" :summary="t('modules.defaultTag')" @click='module.mode = "overlay"'/>
