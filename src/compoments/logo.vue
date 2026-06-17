@@ -174,11 +174,13 @@
 }
 </style>
 
-<script lang="ts">
+<script setup lang="ts">
 import { ref } from 'vue';
-const dev_mode = ref(import.meta.env.DEV);
+import { IS_RELEASE } from '../lib/constants_gen'
+
+const dev_mode = ref(IS_RELEASE);
+</script>
 
 export default {
   name: 'Logo',
 }
-</script>

@@ -10,7 +10,7 @@ let cachedLocales: { code: string; display: string }[] | null = null
 const i18n = createI18n({
   legacy: false,
   locale: 'zh-CN',
-  fallbackLocale: 'zh-CN',
+  fallbackLocale: 'en-US',
   messages: {},
 })
 

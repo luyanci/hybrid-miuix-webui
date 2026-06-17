@@ -1,48 +1,46 @@
 <script setup lang="ts">
-import { ref,onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
-import {MiuixCard,MiuixSmallTitle,MiuixSwitch,MiuixText,MiuixButton,MiuixRadioButtonPreference,MiuixDropdownPreference,MiuixInput,MiuixBasicComponent,MiuixIcon} from 'miuix-vue'
-import { Info,Close } from 'miuix-vue/icons'
-import { Motion,AnimatePresence } from 'motion-v'
-import { run_hybird_daemon_status_command,run_hybird_api_command } from '../lib/hybrid';
+import { MiuixCard, MiuixSwitch, MiuixText, MiuixBasicComponent, MiuixIcon } from 'miuix-vue'
+import { Info, Close } from 'miuix-vue/icons'
+import { Motion, AnimatePresence } from 'motion-v'
+import { API } from '../lib/api';
+import type { KasumiStatus } from '../lib/types';
+import { showSnackbar } from 'miuix-vue';
 
-const kasumi = ref({
-  enabled: false,
-  available: false,
-  lkm_autoload: true,
-  lkm_loaded: false,
-  mirror_path: '',
-  protocol_version: null,
-  rule_count: 0,
-  lkm_current_kmi: '',
-  
-})
+const kasumi = ref<KasumiStatus | null>(null);
 const show_lkm_settings = ref(false)
 const expandSpring = { type: 'spring' as const, stiffness: 400, damping: 40 }
 
-onMounted(
-  async () => { 
-    await run_hybird_daemon_status_command().then(async (daemon_status) => { 
-      console.log(daemon_status.kasumi);
-      kasumi.value = daemon_status.kasumi;
-      console.info(kasumi.value);
-    });
-
-    await run_hybird_api_command('config-get').then(async (configs) => {
-      console.log(configs);
-      kasumi.value.enabled = configs.kasumi.enabled;
-      console.info(kasumi.value);
-    });
+async function toggleKasumiEnabled(enabled: boolean) {
+  if (!kasumi.value) return;
+  try {
+    await API.setKasumiEnabled(enabled);
+    // Reload status after toggle
+    kasumi.value = await API.getKasumiStatus();
+    showSnackbar({ message: enabled ? t('config.kasumiEnabledSuccess') || 'Kasumi enabled' : t('config.kasumiDisabledSuccess') || 'Kasumi disabled' });
+  } catch (e) {
+    console.error('Failed to toggle kasumi:', e);
   }
-)
+}
+
+onMounted(async () => {
+  try {
+    await API.wakeDaemon();
+    kasumi.value = await API.getKasumiStatus();
+    console.info('Kasumi status:', kasumi.value);
+  } catch (e) {
+    console.error('Failed to load kasumi status:', e);
+  }
+});
 
 
 </script>
 
 <template>
   <div class="page">
-    <div v-if="!kasumi.available || !kasumi.lkm_loaded">
+    <div v-if="!kasumi?.available || !kasumi?.lkm?.loaded">
       <MiuixCard class="ex-card ex-card--pad"
         show-indication
         style="--m-card-color: var(--m-color-error)"> 
@@ -51,12 +49,12 @@ onMounted(
             <MiuixIcon :icon="Close" color="var(--m-color-on-error)"/>
           </template>
           <template #end>
-            <MiuixText style="color:var(--m-color-on-error);"><b>{{!kasumi.available? t('kasumi.statusUnavailable'):t('kasumi.statusDisabled')}}</b></MiuixText>
+            <MiuixText style="color:var(--m-color-on-error);"><b>{{kasumi?.available ? t('kasumi.statusUnavailable') : t('kasumi.statusDisabled')}}</b></MiuixText>
           </template>
         </MiuixBasicComponent>
       </MiuixCard>
     </div>
-    <div v-else-if="kasumi.available&&kasumi.lkm_loaded"> 
+    <div v-else-if="kasumi?.available && kasumi?.lkm?.loaded"> 
       <MiuixCard class="ex-card ex-card--pad"
         show-indication
         style="--m-card-color: var(--m-color-primary-variant)"> 
@@ -65,7 +63,7 @@ onMounted(
             <MiuixIcon :icon="Info" color="var(--m-color-on-primary-variant)"/>
           </template>
           <template #end>
-            <MiuixText :size="18" weight="medium"><b>{{t('kasumi.statusWorking')}}</b></MiuixText>
+            <MiuixText :size="18" weight="medium" style="color:var(--m-color-on-primary-variant);">{{t('kasumi.statusWorking')}}</MiuixText>
           </template>
         </MiuixBasicComponent>
       </MiuixCard>
@@ -93,12 +91,12 @@ onMounted(
           <MiuixText>{{t('config.kasumiMasterSwitch')}}</MiuixText>
         </template>
         <template #end>
-          <MiuixSwitch v-model="kasumi.enabled" label="Enabled" :disabled="!kasumi.available" />
+          <MiuixSwitch :model-value="kasumi?.config?.enabled" label="Enabled" :disabled="kasumi?.available && !kasumi?.config?.enabled" @update:model-value="toggleKasumiEnabled" />
         </template>
       </MiuixBasicComponent>
     </MiuixCard>
     <AnimatePresence :initial="false">
-      <Motion v-if="kasumi.enabled" class="ex-expand"
+      <Motion v-if="kasumi?.config?.enabled" class="ex-expand"
             :initial="{ height: 0, opacity: 0 }"
             :animate="{ height: 'auto', opacity: 1 }"
             :exit="{ height: 0, opacity: 0 }"
@@ -109,6 +107,7 @@ onMounted(
                 <MiuixText :size="18" weight="medium">{{t('kasumi.autoloadOn')}}</MiuixText>
               </template>
             </MiuixBasicComponent>
+            <AnimatePresence :initial="false">
             <Motion v-if="show_lkm_settings" class="ex-expand"
             :initial="{ height: 0, opacity: 0 }"
             :animate="{ height: 'auto', opacity: 1 }"
@@ -116,10 +115,11 @@ onMounted(
             :transition="expandSpring"> 
               <MiuixBasicComponent :title="t('kasumi.currentKmi')">
                 <template #end>
-                  <MiuixText>{{kasumi.lkm_current_kmi}}</MiuixText>
+                  <MiuixText>{{kasumi?.lkm?.current_kmi}}</MiuixText>
                 </template>
               </MiuixBasicComponent>
             </Motion>
+            </AnimatePresence>
           </MiuixCard>
       </Motion>
     </AnimatePresence>
@@ -141,5 +141,12 @@ onMounted(
 }
 .ex-expand {
   overflow: hidden;
+}
+.ex-basic-row {
+  display: flex;
+  gap: 12px;
+}
+.ex-grow {
+  flex: 1;
 }
 </style>
