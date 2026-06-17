@@ -3,11 +3,11 @@
 <img src="https://raw.githubusercontent.com/Hybrid-Mount/meta-hybrid_mount/main/icon.svg" align="right" width="120" />
 
 ![语言](https://img.shields.io/badge/Language-TypeScript-3178C6?style=flat-square&logo=typescript)
-![框架](https://img.shields.io/badge/Framework-SolidJS-2C4F7C?style=flat-square&logo=solid)
+![框架](https://img.shields.io/badge/Framework-vue.js-35495e?style=flat-square&logo=vuedotjs)
 ![平台](https://img.shields.io/badge/Platform-Android%20%2F%20KernelSU-green?style=flat-square&logo=android)
 ![许可证](https://img.shields.io/badge/License-Apache--2.0-blue?style=flat-square)
 
-Hybrid Mount WebUI 是 **Hybrid Mount** 的 Miuix-vue 前端控制台，
+Hybrid Miuix WebUI 是 **Hybrid Mount** 的 Miuix-vue 前端控制台，
 面向 KernelSU 场景提供配置管理、模块策略编辑、运行诊断和运维动作入口。
 
 **[English](README.md)** &nbsp; **[简体中文](README.zh-CN.md)**

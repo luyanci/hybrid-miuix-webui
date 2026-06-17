@@ -3,7 +3,7 @@
 <img src="https://raw.githubusercontent.com/Hybrid-Mount/meta-hybrid_mount/main/icon.svg" align="right" width="120" />
 
 ![Language](https://img.shields.io/badge/Language-TypeScript-3178C6?style=flat-square&logo=typescript)
-![Framework](https://img.shields.io/badge/Framework-SolidJS-2C4F7C?style=flat-square&logo=solid)
+![Framework](https://img.shields.io/badge/Framework-vue.js-35495e?style=flat-square&logo=vuedotjs)
 ![Platform](https://img.shields.io/badge/Platform-Android%20%2F%20KernelSU-green?style=flat-square&logo=android)
 ![License](https://img.shields.io/badge/License-Apache--2.0-blue?style=flat-square)
 
