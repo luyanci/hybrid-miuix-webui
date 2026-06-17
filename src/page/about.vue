@@ -11,7 +11,7 @@ import {
 import hybrid from '../compoments/logo.vue'
 import { useI18n } from 'vue-i18n'
 import axios from 'axios'
-import { run_hybird_api_command_open_url } from '../lib/hybrid'
+import { API } from '../lib/api'
 
 const version = __APP_VERSION__
 
@@ -55,6 +55,10 @@ axios.get('https://api.github.com/repos/hybrid-mount/meta-hybrid_mount/contribut
 })
 
 console.info(contributors.value);
+function run_hybird_api_command_open_url(url: string) {
+  API.openLink(url)
+}
+
 function open_github_repo() {
   run_hybird_api_command_open_url('https://github.com/hybrid-mount/meta-hybrid_mount')
 }
