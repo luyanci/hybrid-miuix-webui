@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import Vconsole from 'vconsole'
+// import Vconsole from 'vconsole'
 import i18n, { initI18n } from './locales'
 import './style.css'
 import 'miuix-vue/style.css'
