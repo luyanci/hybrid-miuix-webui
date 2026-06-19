@@ -22,11 +22,10 @@ const kasumi_supported = ref(false)
 
 const filterModules = computed(() => {
   if (searchQuery.value.trim() === '') {
-    return modules_list.value.filter(module => module.enabled)
+    return modules_list.value
   }
   const query = searchQuery.value.toLowerCase()
   return modules_list.value.filter(module =>
-    module.enabled &&
     module.name.toLowerCase().includes(query) ||
     module.description.toLowerCase().includes(query) ||
     module.id.toLowerCase().includes(query)
@@ -83,6 +82,7 @@ onMounted(async () => {
         <MiuixBasicComponent :title="module.name" :summary='module.id + " " + module.version' :clickable="true" @click='module.Bottomopen = !module.Bottomopen'>
           <template #end>
             <MiuixText v-if="module.mount_error" type="body2" color="var(--m-color-error)">{{t('modules.mountError')}}</MiuixText>
+            <MiuixText v-else-if="module.mode === 'ignore'" type="body2" color="var(--m-color-on-surface-variant-actions)">{{ t("modules.modes.unmounted") }}</MiuixText>
             <MiuixText v-else type="body2" color="var(--m-color-on-surface-variant-actions)">{{module.is_mounted? t('modules.modes.'+module.mode) : t("modules.modes.unmounted")}}</MiuixText>
           </template>
         </MiuixBasicComponent>

@@ -123,7 +123,14 @@ onMounted(async () => {
       <MiuixBasicComponent :title="t('status.selinux')" :summary="selinux" /> 
     </MiuixCard>
 
-    <MiuixSmallTitle :text="t('status.activePartitions')" />
+    <div v-if="activeMounts.length > 0">
+      <MiuixSmallTitle :text="t('status.activePartitions')" />
+      <MiuixCard class="ex-card"> 
+        <div class="ex-basic-row ex-grow">
+          <MiuixBasicComponent v-for="(mount, index) in activeMounts" :key="index" :title="mount"  />
+        </div>
+      </MiuixCard>
+    </div>
   </div>
 </template>
 

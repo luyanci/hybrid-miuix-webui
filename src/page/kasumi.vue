@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 import { MiuixCard, MiuixSwitch, MiuixText, MiuixBasicComponent, MiuixIcon } from 'miuix-vue'
-import { Info, Close } from 'miuix-vue/icons'
+import { Info, Close, ChevronForward } from 'miuix-vue/icons'
 import { Motion, AnimatePresence } from 'motion-v'
 import { API } from '../lib/api';
 import type { KasumiStatus } from '../lib/types';
@@ -105,21 +105,57 @@ onMounted(async () => {
             <MiuixBasicComponent :title="t('kasumi.lkmTitle')" :clickable="true" @click="show_lkm_settings = !show_lkm_settings">
               <template #end>
                 <MiuixText :size="18" weight="medium">{{t('kasumi.autoloadOn')}}</MiuixText>
+                <span class="ex-gap8"/>
+                <MiuixIcon :icon="ChevronForward" :size="16" />
               </template>
             </MiuixBasicComponent>
             <AnimatePresence :initial="false">
-            <Motion v-if="show_lkm_settings" class="ex-expand"
+              <Motion v-if="show_lkm_settings" class="ex-expand"
             :initial="{ height: 0, opacity: 0 }"
             :animate="{ height: 'auto', opacity: 1 }"
             :exit="{ height: 0, opacity: 0 }"
             :transition="expandSpring"> 
-              <MiuixBasicComponent :title="t('kasumi.currentKmi')">
-                <template #end>
-                  <MiuixText>{{kasumi?.lkm?.current_kmi}}</MiuixText>
-                </template>
-              </MiuixBasicComponent>
-            </Motion>
+                <MiuixBasicComponent :title="t('kasumi.currentKmi')">
+                  <template #end>
+                    <MiuixText>{{kasumi?.lkm?.current_kmi}}</MiuixText>
+                  </template>
+                </MiuixBasicComponent>
+              </Motion>
             </AnimatePresence>
+
+            <MiuixBasicComponent :title="t('kasumi.runtimeTitle')">
+              <template #end>
+                <MiuixIcon :icon="ChevronForward" :size="16" />
+              </template>
+            </MiuixBasicComponent>
+
+            <MiuixBasicComponent :title="t('kasumi.identityTitle')">
+              <template #end>
+                <MiuixText :size="14">{{t('kasumi.unameModeScoped')}}</MiuixText>
+                <span class="ex-gap8"/>
+                <MiuixIcon :icon="ChevronForward" :size="16" />
+              </template>
+            </MiuixBasicComponent>
+
+            <MiuixBasicComponent :title="t('kasumi.userHideTitle')">
+              <template #end>
+                <MiuixIcon :icon="ChevronForward" :size="16" />
+              </template>
+            </MiuixBasicComponent>
+
+            <MiuixBasicComponent :title="t('kasumi.mapsTitle')">
+              <template #end>
+                <MiuixText :size="14">{{kasumi?.user_hide_rule_count}}</MiuixText>
+                <span class="ex-gap8"/>
+                <MiuixIcon :icon="ChevronForward" :size="16" />
+              </template>
+            </MiuixBasicComponent>
+
+            <MiuixBasicComponent :title="t('kasumi.featuresTitle')">
+              <template #end>
+                <MiuixIcon :icon="ChevronForward" :size="16" />
+              </template>
+            </MiuixBasicComponent>
           </MiuixCard>
       </Motion>
     </AnimatePresence>
@@ -148,5 +184,8 @@ onMounted(async () => {
 }
 .ex-grow {
   flex: 1;
+}
+.ex-gap8 {
+  width: 8px;
 }
 </style>
