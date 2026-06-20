@@ -1,63 +1,51 @@
 <template>
-    <div v-if="!dev_mode" class="app-logo">
-        <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 120 120"
-        class="dev-logo"
-        >
-            <circle cx="60" cy="60" r="50" class="logo-base-track" />
-            <circle cx="60" cy="60" r="38" class="logo-base-track" />
-            <circle cx="60" cy="60" r="26" class="logo-base-track" />
+  <div v-if="!dev_mode" class="app-logo">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 120 120"
+      class="dev-logo"
+    >
+      <circle cx="60" cy="60" r="50" class="logo-base-track" />
+      <circle cx="60" cy="60" r="38" class="logo-base-track" />
+      <circle cx="60" cy="60" r="26" class="logo-base-track" />
 
-            <g class="dev-logo-outer-group">
-                <path
-                d="M 60 10 A 50 50 0 1 1 10 60"
-                class="logo-arc logo-arc-outer"
-                />
-            </g>
+      <g class="dev-logo-outer-group">
+        <path d="M 60 10 A 50 50 0 1 1 10 60" class="logo-arc logo-arc-outer" />
+      </g>
 
-            <g class="dev-logo-mid-group">
-                <path
-                d="M 60 22 A 38 38 0 0 1 60 98"
-                class="logo-arc logo-arc-mid logo-arc-error"
-                />
-            </g>
+      <g class="dev-logo-mid-group">
+        <path
+          d="M 60 22 A 38 38 0 0 1 60 98"
+          class="logo-arc logo-arc-mid logo-arc-error"
+        />
+      </g>
 
-            <g class="dev-logo-inner-group">
-                <path
-                d="M 60 34 A 26 26 0 1 1 47 82.5"
-                class="logo-arc logo-arc-inner"
-                />
-            </g>
+      <g class="dev-logo-inner-group">
+        <path
+          d="M 60 34 A 26 26 0 1 1 47 82.5"
+          class="logo-arc logo-arc-inner"
+        />
+      </g>
 
-            <circle cx="60" cy="60" r="10" class="logo-core" />
-        </svg>
-    </div>
-    <div v-else class="app-logo"> 
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="50" class="logo-base-track" />
-            <circle cx="60" cy="60" r="38" class="logo-base-track" />
-            <circle cx="60" cy="60" r="26" class="logo-base-track" />
+      <circle cx="60" cy="60" r="10" class="logo-core" />
+    </svg>
+  </div>
+  <div v-else class="app-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="50" class="logo-base-track" />
+      <circle cx="60" cy="60" r="38" class="logo-base-track" />
+      <circle cx="60" cy="60" r="26" class="logo-base-track" />
 
-            <path
-            d="M60 10 A 50 50 0 0 1 110 60"
-            class="logo-arc logo-arc-outer"
-            />
-            <path
-            d="M60 98 A 38 38 0 0 1 60 22"
-            class="logo-arc logo-arc-mid"
-            />
-            <path
-            d="M34 60 A 26 26 0 1 1 86 60"
-            class="logo-arc logo-arc-inner"
-            />
+      <path d="M60 10 A 50 50 0 0 1 110 60" class="logo-arc logo-arc-outer" />
+      <path d="M60 98 A 38 38 0 0 1 60 22" class="logo-arc logo-arc-mid" />
+      <path d="M34 60 A 26 26 0 1 1 86 60" class="logo-arc logo-arc-inner" />
 
-            <circle cx="60" cy="60" r="10" class="logo-core" />
-        </svg>
-    </div>
+      <circle cx="60" cy="60" r="10" class="logo-core" />
+    </svg>
+  </div>
 </template>
 
-<style> 
+<style>
 .app-logo {
   width: 120px;
   height: 120px;
@@ -175,12 +163,10 @@
 </style>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { IS_RELEASE } from '../lib/constants_gen'
+import { ref } from "vue";
+import { IS_RELEASE } from "../lib/constants_gen";
 
 const dev_mode = ref(IS_RELEASE);
 </script>
 
-export default {
-  name: 'Logo',
-}
+export default { name: 'Logo', }
