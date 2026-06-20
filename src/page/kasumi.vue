@@ -1,3 +1,6 @@
+
+
+<!-- TODO: Add kasumi settings,wait anantx complete the next api version -->
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useI18n } from "vue-i18n";

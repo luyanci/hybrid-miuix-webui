@@ -1,4 +1,9 @@
+
+@import url("https://mui.kernelsu.org/internal/insets.css");
+
 :root {
+  --top-inset: var(--window-inset-top, 0px);
+  --bottom-inset: var(--window-inset-bottom, 0px);
   font-family:
     "MiSans VF",
     system-ui,

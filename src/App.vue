@@ -14,7 +14,6 @@ import {
 import {
   ScreenMirroring,
   Settings,
-  Tune,
   Info,
   Folder,
   Close2,
@@ -23,7 +22,7 @@ import { API } from "./lib/api";
 
 import status from "./page/status.vue";
 import config from "./page/config.vue";
-import kasumi from "./page/kasumi.vue";
+// import kasumi from "./page/kasumi.vue"; // TODO: This Page is not ready yet
 import modules from "./page/modules.vue";
 import about from "./page/about.vue";
 
@@ -35,16 +34,15 @@ const RebootSummary = t("common.rebootConfirm");
 
 const rebootreq_click = ref(false);
 
-const pages = [status, config, kasumi, modules, about];
+const pages = [status, config, modules, about];
 const titles = [
   t("tabs.status"),
   t("tabs.config"),
-  t("tabs.kasumi"),
   t("tabs.modules"),
   t("tabs.info"),
 ];
 const navItems = titles.map((label) => ({ label }));
-const navicoms = [ScreenMirroring, Settings, Tune, Folder, Info];
+const navicoms = [ScreenMirroring, Settings, Folder, Info];
 
 const navindex = ref(0);
 const activepage = computed(() => pages[navindex.value]);
@@ -103,7 +101,7 @@ onBeforeUnmount(() => {
   <div class="app">
     <!-- The TopAppBar is the screen's top bar -->
     <MiuixScrollArea ref="scrollerRef" class="app__body">
-      <MiuixTopAppBar :large="false" :title="Apptitle">
+      <MiuixTopAppBar :large="false" :title="Apptitle" class="app__top">
         <template #actions>
           <MiuixIconButton aria-label="Toggle" @click="rebootreq_click = true">
             <MiuixIcon :icon="Close2" :size="24" />
@@ -161,10 +159,13 @@ onBeforeUnmount(() => {
   overflow: hidden;
   --m-scroll-area-inset-top: 52px;
 }
-
+.app__top {
+  padding-top: var(--top-inset);
+}
 .app__bottom {
   flex: none;
   z-index: 10;
+  padding-bottom: var(--bottom-inset);
 }
 
 .page-enter-active,
